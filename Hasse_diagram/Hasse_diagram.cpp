@@ -7,6 +7,7 @@
 	#include <map>
 	#include <ctime>
 	#include <vector>
+
 	#include "SpecialTree.h"
 	#include "FacetTree.h"
 
@@ -15,7 +16,7 @@
 	int v_num, f_num, dim;
 	int k = 0;
 	// 1 set - face set, 2 set - vertex set
-	vector<vector<pair<vector<bool>, set<int>>>> HDiagramm_lvls;
+	vector<list<pair<vector<bool>, set<int>>>> HDiagramm_lvls;
 	map <vector<bool>, set<int>> full_set;
 	SpecialTree* sch_tree = new SpecialTree();
 
@@ -40,21 +41,22 @@
 		return int_vec;
 	}
 	// if vertices incedent - true 
-	void Search_of_Edges(vector<pair<vector<bool>, set<int>>> k_lvl, vector<pair<vector<bool>, set<int>>> kplus_lvl)
+	void Search_of_Edges(list<pair<vector<bool>, set<int>>> k_lvl, list<pair<vector<bool>, set<int>>> kplus_lvl)
 	{
-		for (int i = 0; i < k_lvl.size(); i++)
+		for (auto i = k_lvl.begin(); i != k_lvl.end(); i++)
 		{
 			cout << "{";
-			Print_Vertices(k_lvl[i]);
+			Print_Vertices(*i);
 			cout << "}:	{";
-			for (int j = 0; j < kplus_lvl.size(); j++)
+			for (auto j = kplus_lvl.begin(); j != kplus_lvl.end(); j++)
 			{
-				if (kplus_lvl[j].first == Face_Intersection(k_lvl[i].first, kplus_lvl[j].first))
+				if ((*j).first == Face_Intersection((*i).first, (*j).first))
 				{
-					Print_Vertices(kplus_lvl[j]);
+					Print_Vertices(*j);
 					cout << ",";
 				}
 			}
+			cout << '\b';
 			cout << "}";
 			cout << "\n";
 		}
@@ -67,31 +69,44 @@
 		return st3;
 	}
 	// realization with RBT 
-	vector<pair<vector<bool>, set<int>>> Face_Enumeration_1(vector<pair<vector<bool>, set<int>>> &k_lvl)
+	list<pair<vector<bool>, set<int>>> Face_Enumeration_1(list<pair<vector<bool>, set<int>>> &k_lvl)
 	{
-		vector<bool> fll_set(f_num, false);
 
-		vector<pair<vector<bool>, set<int>>> k_plus1_lvl;
-		for (int i=0; i<k_lvl.size()-1; i++)
+		list<pair<vector<bool>, set<int>>> k_plus1_lvl;
+
+		list<pair<vector<bool>, set<int>>>::iterator it = k_lvl.begin();
+
+		for (; (*it)!=k_lvl.back(); it++)
 		{
-			for (int j = i+1; j<k_lvl.size(); j++)
+ 			for (auto j = it++; j!= k_lvl.end(); j++)
 			{
-				vector<bool> candidat=Face_Intersection(k_lvl[i].first, k_lvl[j].first);
-				set<int> candidat_vert=Get_New_Face(k_lvl[i].second, k_lvl[j].second);
+				vector<bool> candidat = Face_Intersection((*it).first,(*j).first);
+				set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
 				if (full_set.find(candidat) == full_set.end())
 				{
-					
-						if (candidat == k_lvl[i].first)
-						{
-							k_lvl.erase(k_lvl.begin() + i);
-						}
-						if (candidat == k_lvl[j].first)
-						{
-							k_lvl.erase(k_lvl.begin() + j);
-						}
-						full_set.insert(make_pair(candidat, candidat_vert));
-							k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
-						
+
+					if (candidat == (*it).first)
+					{
+						it=k_lvl.erase(it);
+					}
+					if (candidat == (*j).first)
+					{
+						j=k_lvl.erase(j);
+					}
+					full_set.insert(make_pair(candidat, candidat_vert));
+					k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+
+				}
+				else
+				{
+					for (auto it = k_lvl.begin(); it != k_lvl.end();)
+					{
+						if ( (*it).first == candidat)
+							k_lvl.erase(it);
+						else it++;
+					}
+
+					k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
 				}
 			}
 		}
@@ -99,31 +114,43 @@
 		
 	}
 	//realization with special search structure 
-	vector<pair<vector<bool>, set<int>>> Face_Enumeration_2(vector<pair<vector<bool>, set<int>>> & k_lvl)
+	list<pair<vector<bool>, set<int>>> Face_Enumeration_2(list<pair<vector<bool>, set<int>>> & k_lvl)
 	{
-		vector<bool> fll_set(f_num, false);
 
-		vector<pair<vector<bool>, set<int>>> k_plus1_lvl;
-		for (int i = 0; i < k_lvl.size() - 1; i++)
+		list<pair<vector<bool>, set<int>>> k_plus1_lvl;
+		list<pair<vector<bool>, set<int>>>::iterator it = k_lvl.begin();
+
+		for (; (*it) != k_lvl.back(); it++)
 		{
-			for (int j = i + 1; j < k_lvl.size(); j++)
+			for (auto j = it++; j != k_lvl.end(); j++)
 			{
-				vector<bool> candidat = Face_Intersection(k_lvl[i].first, k_lvl[j].first);
-				set<int> candidat_vert = Get_New_Face(k_lvl[i].second, k_lvl[j].second);
-				if (sch_tree->Search(candidat) == false)
+				vector<bool> candidat = Face_Intersection((*it).first, (*j).first);
+				set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
+				if (full_set.find(candidat) == full_set.end())
 				{
-					
-						if (candidat == k_lvl[i].first)
-						{
-							k_lvl.erase(k_lvl.begin() + i);
-						}
-						if (candidat == k_lvl[j].first)
-						{
-							k_lvl.erase(k_lvl.begin() + j);
-						}
-						sch_tree->Insert(candidat);
-							k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
-						
+
+					if (candidat == (*it).first)
+					{
+						it=k_lvl.erase(it);
+					}
+					if (candidat == (*j).first)
+					{
+						it=k_lvl.erase(j);
+					}
+					sch_tree->Insert(candidat);
+					k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+
+				}
+				else
+				{
+					for (auto it = k_lvl.begin(); it != k_lvl.end(); )
+					{
+						if ((*it).first == candidat)
+							it = k_lvl.erase(it);
+						else it++;
+					}
+
+					k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
 				}
 			}
 		}
@@ -139,18 +166,18 @@
 		}
 		cout << "}\n";
 	}
-	void View_Element_FullSet(vector<pair<vector<bool>, set<int>>> fll_st)
+	void View_Element_FullSet(list<pair<vector<bool>, set<int>>> fll_st)
 	{
 		cout << "dim " << dim << ":\n";
 		cout << "{";
-		Print_Vertices(fll_st[0]);
+		Print_Vertices(fll_st.front());
 		cout << "}:	{ }\n";
 	}
 	void Build_Face_Set(bool struc_ind)
 	{
 		while (k != dim)
 		{
-			vector<pair<vector<bool>, set<int>>> & ref = HDiagramm_lvls[k];
+			list<pair<vector<bool>, set<int>>> & ref = HDiagramm_lvls[k];
 			if (struc_ind)
 				HDiagramm_lvls[k + 1] = Face_Enumeration_2(ref);
 			else
@@ -217,135 +244,137 @@
 		cout << "enter filename" << "\n";
 		string filename;
 		std::cin >> filename; 
-		std::ifstream infile(filename);
-		std::string line;
-		vector<bool> rez_face_set;	
-		set<int> vertex;
-		int i = 0;
-		//enter matrix
-		while (std::getline(infile, line))
-		{
-			if (line.find_first_not_of(' ') != std::string::npos)
-			{
-				if (i == 0)
-					v_num=std::stoi(line);
-				if (i == 1)
-					f_num = std::stoi(line);
-				if (i == 2)
-				{
-					dim = std::stoi(line);
-					HDiagramm_lvls.resize(dim + 1);
-				}
-				else if (i>2)
-				{
-					Vert_List_Building(line);
-					vertex.clear();
-					rez_face_set.clear();
-					rez_face_set.resize(f_num);
-					vertex.insert(i-2);
-					int str_pars = 0; string inc_num;
-					while (line[str_pars]!='\0')
-					{
-						inc_num = inc_num + line[str_pars];
-						if (line[str_pars] == ' ' || line[str_pars+1] == '\0')
-						{
-							rez_face_set[std::stoi(inc_num)-1]=true;
-							inc_num.clear();
-						}
-						str_pars++;
-					}
-					HDiagramm_lvls[0].push_back(make_pair(rez_face_set, vertex));
-				}
-				
-			}
-			i++;	
-		}
-			
-			
-		// start timing 1
-		unsigned int start_time = clock();
-		// if bool false - use standart structure
-
-		//Build_Diagramm(false);
 		
-		unsigned int end_time = clock();
-		unsigned int search_time1 = end_time - start_time;
-		// end timing 1
-		//start timing 2
-		k = 0;
-		// clean vector of faces
-		HDiagramm_lvls.erase(HDiagramm_lvls.begin()+1, HDiagramm_lvls.end());
-		HDiagramm_lvls.resize(dim+1);
-		cout << "____________________________\n\n";
-		start_time = clock();
-		// if bool true - use special structure 
-
-		//Build_Diagramm(true);
-
-		end_time = clock();
-		unsigned int search_time2 = end_time - start_time;
-		//end timing 2
-		start_time = clock();
-		KP_Algorithm();
-		cout << "____________________________\n\n";
-		end_time = clock();
-
-		cout << "(0)Verts:{}---->{ ";
-		for (int i = 1; i <= v_num; i++)
-			cout <<"("<< i<<") ";
-		cout << " }"<<'\n';
-
-		size_t fin_size = L[L.size()-2].Vert_adrG.Get_size();
-		int k1 = 0, k2=0, start=0;
-		while (k2!=L.size())
-		{
-			start = k1;
-			size_t mem_size=L[k1].Vert_adrH.Get_size();
-			while (k1 != L.size() && L[k1].Vert_adrH.Get_size() == mem_size)
-				k1++;
-			mem_size = L[k1].Vert_adrH.Get_size();
-			k2 = k1;
-			
-			while (k2!=L.size() && L[k2].Vert_adrH.Get_size() == mem_size )
-				k2++;
-			
-			for (int i = start; i < k1; i++)
+			std::ifstream infile(filename);
+			std::string line;
+			vector<bool> rez_face_set;
+			set<int> vertex;
+			int i = 0;
+			//enter matrix
+			while (std::getline(infile, line))
 			{
-				cout << "(" << i+1 << ")" << "Verts:";
-				L[i].Vert_adrG.Print_vert();
-				cout << "---->{ ";
-				for (int j = k1; j < k2; j++)
+				if (line.find_first_not_of(' ') != std::string::npos)
 				{
-					bool flag;
-					for (auto &elem : L[i].Vert_adrG.vertices)
+					if (i == 0)
+						v_num = std::stoi(line);
+					if (i == 1)
+						f_num = std::stoi(line);
+					if (i == 2)
 					{
-						 flag = true;
-						if (find(L[j].Vert_adrG.vertices.begin(), L[j].Vert_adrG.vertices.end(), elem) == L[j].Vert_adrG.vertices.end())
-						{
-							flag = false;
-							break;
-						}
+						dim = std::stoi(line);
+						HDiagramm_lvls.resize(dim + 1);
 					}
-					if (flag)
-						cout << " (" << j+1 << ") ";
+					else if (i > 2)
+					{
+						Vert_List_Building(line);
+						vertex.clear();
+						rez_face_set.clear();
+						rez_face_set.resize(f_num);
+						vertex.insert(i - 2);
+						int str_pars = 0; string inc_num;
+						while (line[str_pars] != '\0')
+						{
+							inc_num = inc_num + line[str_pars];
+							if (line[str_pars] == ' ' || line[str_pars + 1] == '\0')
+							{
+								rez_face_set[std::stoi(inc_num) - 1] = true;
+								inc_num.clear();
+							}
+							str_pars++;
+						}
+						HDiagramm_lvls[0].push_back(make_pair(rez_face_set, vertex));
+					}
+
 				}
-				cout << "}" << '\n';
+				i++;
 			}
-		}
-
-		cout << "(" << L.size() << ")Verts:";
-		L[L.size() - 1].Vert_adrG.Print_vert();
-		cout << "---->{ }"<<'\n';
-
-		//end timing 3
-		unsigned int search_time3 = end_time - start_time;
 
 
-		cout << "____________________________\n" ; 
-		cout << filename<< '\n';
-		cout << "____________________________\n";
+			// start timing 1
+			clock_t start_time = clock();
+			// if bool false - use standart structure
 
-		//cout << "First algorithm with Standart RBT: " << search_time1<<"\n";
-		//cout << "First algorithm with Special search tree structure: " << search_time2 << "\n";
-		cout << "Keibel and Pfetsch modern algorithm: " << search_time3 << "\n";
+			//Build_Diagramm(false);
+
+			clock_t end_time = clock();
+			clock_t search_time1 = end_time - start_time;
+			// end timing 1
+			//start timing 2
+			k = 0;
+			// clean vector of faces
+			HDiagramm_lvls.erase(HDiagramm_lvls.begin() + 1, HDiagramm_lvls.end());
+			HDiagramm_lvls.resize(dim + 1);
+			cout << "____________________________\n\n";
+			start_time = clock();
+			// if bool true - use special structure 
+
+			//Build_Diagramm(true);
+
+			end_time = clock();
+			clock_t search_time2 = end_time - start_time;
+			//end timing 2
+			start_time = clock();
+			KP_Algorithm();
+			cout << "____________________________\n\n";
+
+			cout << "(0)Verts:{}---->{ ";
+			for (int i = 1; i <= v_num; i++)
+				cout << "(" << i << ") ";
+			cout << " }" << '\n';
+
+			size_t fin_size = L[L.size() - 2].Vert_adrG.Get_size();
+			int k1 = 0, k2 = 0, start = 0;
+			while (k2 != L.size())
+			{
+				start = k1;
+				size_t mem_size = L[k1].Vert_adrH.Get_size();
+				while (k1 != L.size() && L[k1].Vert_adrH.Get_size() == mem_size)
+					k1++;
+				mem_size = L[k1].Vert_adrH.Get_size();
+				k2 = k1;
+
+				while (k2 != L.size() && L[k2].Vert_adrH.Get_size() == mem_size)
+					k2++;
+
+				for (int i = start; i < k1; i++)
+				{
+					cout << "(" << i + 1 << ")" << "Verts:";
+					L[i].Vert_adrG.Print_vert();
+					cout << "---->{ ";
+					for (int j = k1; j < k2; j++)
+					{
+						bool flag;
+						for (auto &elem : L[i].Vert_adrG.vertices)
+						{
+							flag = true;
+							if (find(L[j].Vert_adrG.vertices.begin(), L[j].Vert_adrG.vertices.end(), elem) == L[j].Vert_adrG.vertices.end())
+							{
+								flag = false;
+								break;
+							}
+						}
+						if (flag)
+							cout << " (" << j + 1 << ") ";
+					}
+					cout << "}" << '\n'; 
+				}
+			}
+
+			cout << "(" << L.size() << ")Verts:";
+			L[L.size() - 1].Vert_adrG.Print_vert();
+			cout << "---->{ }" << '\n';
+			end_time = clock();
+
+			//end timing 3
+			clock_t search_time3 = (end_time - start_time);
+
+
+			cout << "____________________________\n";
+			cout << filename << '\n';
+			cout << "____________________________\n";
+
+			cout << "First algorithm with Standart RBT: " << (float)search_time1<<"\n";
+			cout << "First algorithm with Special search tree structure: " << (float)search_time2<< "\n";
+			cout << "Keibel and Pfetsch modern algorithm: " << (float)search_time3 << "\n";
+		
 	}
