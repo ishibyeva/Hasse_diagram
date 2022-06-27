@@ -24,14 +24,14 @@ SpecialTree* sch_tree = new SpecialTree();
 // печать вершины
 void Print_Vertices(pair<vector<bool>, set<int>> sm_set)
 {
-cout << '(';
-for (auto i : sm_set.second)
-{
-cout << " ";
-cout << i;
-cout << " ";
-}
-cout << ')';
+	cout << '(';
+	for (auto i : sm_set.second)
+	{
+		cout << " ";
+		cout << i;
+		cout << " ";
+	}
+	cout << ')';
 }
 vector<bool> Face_Intersection(vector<bool> vec1, vector<bool> vec2)
 {
@@ -213,19 +213,19 @@ while (!Q.empty())
 min_sets = Search_of_G_set(Q.front());
 Vertex_set Q_pop = Q.front();
 
-while (!min_sets.empty())
-{
-	if (!ftree->Search(min_sets.front()))
+	while (!min_sets.empty())
 	{
-		Vertex_set* copy = new Vertex_set(min_sets.front());
-		ftree->Insert(*copy);
-		H_Diag_Node New_node = { Q_pop, *copy };
-		L.push_back(New_node);
-		Q.push_back(*copy);
+		if (!ftree->Search(min_sets.front()))
+		{
+			Vertex_set* copy = new Vertex_set(min_sets.front());
+			ftree->Insert(*copy);
+			H_Diag_Node New_node = { Q_pop, *copy };
+			L.push_back(New_node);
+			Q.push_back(*copy);
+		}
+		min_sets.pop_front();
 	}
-	min_sets.pop_front();
-}
-Q.pop_front();
+	Q.pop_front();
 }
 
 

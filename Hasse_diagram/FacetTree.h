@@ -3,8 +3,7 @@
 
 #include "KPf_StorStruct.h"
 
-class FT_Node
-{
+class FT_Node {
 public:
 	Vertex_set& C_S;
 	map<size_t, FT_Node*> edges;
@@ -26,20 +25,15 @@ public:
 
 };
 
-class F_Tree
-{
+class F_Tree {
 public:
-
 	FT_Node* root;
-
 
 	F_Tree();
 	void Insert(Vertex_set &vst);
 	bool Search(Vertex_set &vst);
 	void Destroy_Tree(FT_Node* root);
 	~F_Tree();
-
-	
 };
 
 #endif
