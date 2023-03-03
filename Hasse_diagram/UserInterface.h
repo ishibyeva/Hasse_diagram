@@ -11,77 +11,93 @@
 
 #include "SpecialTree.h"
 #include "FacetTree.h"
+#include "KPf_StorStruct.h"
 
 class Base_Interface {
 protected:
-    std::string data_;
+    std::vector<std::vector<size_t>> data_;
     int v_num_, f_num_, dim_;
+    vector<list<pair<vector<bool>, set<int>>>> Diagramm_lvl;
     int k = 0;
 
 public:
-    Base_Interface();
-    void Print();
-    void Input() {
-        cout << "Enter filename:" << "\n";
-        string filename;
-        std::cin >> filename; 
+    Base_Interface(std::vector<std::vector<size_t>>& vector_form_data) {
+        v_num_ = vector_form_data[0][0];
+        f_num_ = vector_form_data[1][0];
+        dim_ = vector_form_data[2][0];
 
-        std::ifstream infile(filename);
-        std::string line;
-        vector<bool> rez_face_set;
-        set<int> vertex;
-        int i = 0;
-        //enter matrix
-        while (std::getline(infile, line)) {
-            if (line.find_first_not_of(' ') != std::string::npos) {
-                if (i == 0)
-                    v_num_ = std::stoi(line);
-                if (i == 1)
-                    f_num_ = std::stoi(line);
-                if (i == 2) {
-                    dim_ = std::stoi(line);
-                    HDiagramm_lvls.resize(dim_ + 1);
-                }
-                else if (i > 2) {
-                    Vert_List_Building(line);
-                    vertex.clear();
-                    rez_face_set.clear();
-                    rez_face_set.resize(f_num_);
-                    vertex.insert(i - 2);
-                    int str_pars = 0;
-                    std::string inc_num;
-                    while (line[str_pars] != '\0') {
-                        inc_num = inc_num + line[str_pars];
-                        if (line[str_pars] == ' ' || line[str_pars + 1] == '\0') {
-                            rez_face_set[std::stoi(inc_num) - 1] = true;
-                            inc_num.clear();
-                        }
-                        str_pars++;
-                    }
-                    HDiagramm_lvls[0].push_back(make_pair(rez_face_set, vertex));
-                }
+        std::copy(vector_form_data.begin() + 3, vector_form_data.end(), std::back_inserter(data_));
+        Diagramm_lvl.resize(dim_ + 1);
+    }
+    Base_Interface(std::vector<std::vector<size_t>> data, int v_num, int f_num, int dim)
+    : data_(data), v_num_(v_num), f_num_(f_num), dim_(dim) {
 
-            }
-            i++;
-        }
+    }
+    Base_Interface(const Base_Interface& base_interface) {
+        v_num_ = base_interface.v_num_;
+        f_num_ = base_interface.f_num_;
+        dim_ = base_interface.dim_;
+        data_ = base_interface.data_;
     }
     
     virtual void ConvertToData() = 0;
-    virtual void FindDiagramm() = 0;
+    virtual void FindAllFace() = 0;
+    virtual void Output() = 0;
+    //virtual clock_t Timing() = 0; 
     virtual ~Base_Interface() {};
-
 };
 
 class Interface_FR : public Base_Interface {
+public:
+    Interface_FR(std::vector<std::vector<size_t>>& vector_form_data) 
+    : Base_Interface(vector_form_data) {}
     void ConvertToData() override {
+        int facet_iterate = 0;
+        for (auto& face : data_) {
+            vector<bool> binary_face(f_num_, false);
+            set<int> vertex;
+            vertex.insert(facet_iterate++);
+
+            for (auto& number : face) {
+                binary_face[(int)number - 1] = true;
+            }
+            Diagramm_lvl[0].push_back(make_pair(binary_face, vertex));
+        }
 
     }
+
+    void FindAllFace() override {
+
+    }
+
+    void Output() override {
+
+    }
+
 };
 
 class Interface_KP : public Base_Interface {
+public:
+    Interface_KP(std::vector<std::vector<size_t>>& vector_form_data) 
+    : Base_Interface(vector_form_data) {}
     void ConvertToData() override {
+        for (auto& face : data_) {
+            list<size_t> reserv;
+            for (auto& str_elem : face) {
+                reserv.push_back(str_elem);
+            }
+            start_v_storage.push_back(reserv);
+        }
+    }
+    
+    void FindAllFace() override {
 
     }
+
+    void Output() override {
+
+    }
+
 };
 
 #endif

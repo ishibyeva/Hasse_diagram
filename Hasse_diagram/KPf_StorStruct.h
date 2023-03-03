@@ -13,11 +13,8 @@
 
 using namespace std;
 
-
-class Facet_set
-{
+class Facet_set {
 public:
-
 	list<size_t> facet;
 
 	Facet_set();
@@ -25,12 +22,10 @@ public:
 	void Print_Facet();
 	size_t Get_size();
 	~Facet_set();
-
 };
 
 
-class Vertex_set
-{ 
+class Vertex_set { 
 public:
 	
 	list<size_t> vertices;
@@ -47,8 +42,7 @@ public:
 
 };
 
-struct H_Diag_Node
-{
+struct H_Diag_Node {
 	Vertex_set Vert_adrH;
 	Vertex_set Vert_adrG;
 };
@@ -65,7 +59,5 @@ void First_Act(int f_dim);
 void Vert_List_Building(string str);
 void Facet_List_Building(int f_dim);
 list<Vertex_set> Search_of_G_set(Vertex_set &vset);
-
-
 
 #endif

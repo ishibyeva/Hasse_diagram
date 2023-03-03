@@ -1,6 +1,4 @@
-#include "pch.h"
 #include "KPf_StorStruct.h"
-
 
 vector<list<size_t>> start_v_storage;
 vector<list<size_t>> start_f_storage;
@@ -8,64 +6,36 @@ list<size_t> V_set;
 vector<H_Diag_Node> L;
 list<Vertex_set> Q;
 
-Vertex_set::Vertex_set()
-{
+Vertex_set::Vertex_set() {
 	list<size_t> lst;
 	this->vertices = lst;
 }
-Vertex_set::~Vertex_set()
-{
-	
+
+Vertex_set::~Vertex_set() {
 }
-Vertex_set::Vertex_set(list<size_t> vlist)
-{
-	this->vertices=vlist;
+
+Vertex_set::Vertex_set(list<size_t> vlist) : vertices(vlist) {
 }
-Facet_set::Facet_set()
-{
+
+Facet_set::Facet_set() {
 	list<size_t> lst;
 	this->facet = lst;
 }
 
-Facet_set::Facet_set(list<size_t> vlist)
-{
-	this->facet=vlist;
+Facet_set::Facet_set(list<size_t> vlist) : facet(vlist) {
 }
-Facet_set::~Facet_set()
-{
-	
+
+Facet_set::~Facet_set() {
 }
-size_t Vertex_set::Get_size()
-{
+
+size_t Vertex_set::Get_size() {
 	return vertices.size();
 }
-size_t Facet_set::Get_size()
-{
+
+size_t Facet_set::Get_size() {
 	return facet.size();
 }
 
-void Vert_List_Building(string str)
-{
-	list<size_t> resrv;
-	string num;
-
-
-	for (auto &str_elem : str)
-	{
-		if (str_elem != 32)
-			num.push_back(str_elem);
-		else
-		{
-			int a = stoi(num);
-			resrv.push_back((size_t)a);
-			num.erase();
-		}
-	}
-	int a = stoi(num);
-	resrv.push_back((size_t)a);
-	start_v_storage.push_back(resrv);
-
-}
 void Vertex_set::Print_vert()
 {
 	cout << "{";
@@ -75,8 +45,7 @@ void Vertex_set::Print_vert()
 	cout << "}";
 }
 
-void Facet_List_Building(int f_dim)
-{
+void Facet_List_Building(int f_dim) {
 
 	for (int i = 0; i < start_v_storage.size(); i++)
 		V_set.push_back((size_t)(i+1));
@@ -98,15 +67,11 @@ void Facet_List_Building(int f_dim)
 	}
 }
 
-
-
-Vertex_set Vertex_set::Cl_operation(list<size_t> &lst)
-{
+Vertex_set Vertex_set::Cl_operation(list<size_t> &lst) {
 	Facet_set F_rezlt;
 	F_rezlt = this->F_operation(lst);
-	if (F_rezlt.facet.empty())
-	{
-		Vertex_set v({});
+	if (F_rezlt.facet.empty()) {
+		Vertex_set v;
 		return v;
 	}
 	list<size_t> intersec= start_f_storage[F_rezlt.facet.front() - 1];
@@ -121,11 +86,9 @@ Vertex_set Vertex_set::Cl_operation(list<size_t> &lst)
 			search_str.insert(num);
 		intersec.clear();
 		
-		for (auto &num1 : start_f_storage[*i - 1])
-		{
+		for (auto &num1 : start_f_storage[*i - 1]) {
 			if (search_str.find(num1) != search_str.end())
 				intersec.push_back(num1);
-			
 		}
 	}
 
@@ -133,13 +96,12 @@ Vertex_set Vertex_set::Cl_operation(list<size_t> &lst)
 	return A;
 }
 
-Vertex_set Vertex_set::Cl_operation()
-{
+Vertex_set Vertex_set::Cl_operation() {
 	Facet_set F_rezlt;
 	F_rezlt = this->F_operation();
 	if (F_rezlt.facet.empty())
 	{
-		Vertex_set v({});
+		Vertex_set v;
 		return v;
 	}
 	list<size_t> intersec = start_f_storage[F_rezlt.facet.front() - 1];
@@ -147,50 +109,43 @@ Vertex_set Vertex_set::Cl_operation()
 	std::list<size_t>::const_iterator i;
 	i = F_rezlt.facet.begin();
 	++i;
-	for (; i != F_rezlt.facet.end(); ++i)
-	{
+	for (; i != F_rezlt.facet.end(); ++i) {
 		unordered_set<size_t> search_str;
 		for (auto &num : intersec)
 			search_str.insert(num);
 		intersec.clear();
 
-		for (auto &num1 : start_f_storage[*i - 1])
-		{
+		for (auto &num1 : start_f_storage[*i - 1]) {
 			if (search_str.find(num1) != search_str.end())
 				intersec.push_back(num1);
-
 		}
 	}
 
 	Vertex_set A(intersec);
 	return A;
 }
-Facet_set Vertex_set::F_operation(list<size_t> &lst)
-{
+
+Facet_set Vertex_set::F_operation(list<size_t> &lst) {
 	list<size_t> resrv;
 	resrv = lst;
 
-	for (auto &i : vertices)
-	{
+	for (auto &i : vertices) {
 		
 		unordered_set<size_t> search_str;
 		for (auto &num : resrv)
 			search_str.insert(num);
 		resrv.clear();
-		for (auto &num1 : start_v_storage[i-1])
-		{
+		for (auto &num1 : start_v_storage[i-1]) {
 			if (search_str.find(num1) != search_str.end())
 				resrv.push_back(num1);
 		}
 	}
 
-
 	Facet_set A(resrv);
 	return A;
 }
 
-Facet_set Vertex_set::F_operation()
-{
+Facet_set Vertex_set::F_operation() {
 	list<size_t> resrv;
 	resrv = start_v_storage[vertices.front()-1];
 	list<size_t>::iterator it = ++vertices.begin();
@@ -213,17 +168,15 @@ Facet_set Vertex_set::F_operation()
 	return A;
 }
 
-void First_Act(int f_dim)
-{
+void First_Act(int f_dim) {
 	Facet_List_Building(f_dim);
 	list<size_t> vert_l = {};
 	Vertex_set * first_set = new Vertex_set(vert_l);
 	
 	Q.push_back(vert_l);
-
 }
-vector<pair<Vertex_set, size_t>> Compute_H_Collection(Vertex_set &vset)
-{
+
+vector<pair<Vertex_set, size_t>> Compute_H_Collection(Vertex_set &vset) {
 	vector<pair<Vertex_set, size_t>> H_set;
 	list<size_t> set_wt_vset = V_set;
 	for (auto &i : vset.vertices)
@@ -240,8 +193,8 @@ vector<pair<Vertex_set, size_t>> Compute_H_Collection(Vertex_set &vset)
 	return H_set;
 }
 
-list<Vertex_set> Search_of_G_set(Vertex_set &vset)
-{
+list<Vertex_set> Search_of_G_set(Vertex_set &vset) {
+
 	list<Vertex_set> res_collection;
 	vector<pair<Vertex_set, size_t>> H_set = Compute_H_Collection(vset);
 	bool flag;
@@ -251,23 +204,18 @@ list<Vertex_set> Search_of_G_set(Vertex_set &vset)
 	for (auto &vert : H_set)
 		Candidate_list.insert(make_pair(vert.second, false));
 
-	for (int i = 0; i < H_set.size(); i++)
-	{
+	for (int i = 0; i < H_set.size(); i++) {
 		auto vert = Candidate_list.find(H_set[i].second);
-			if (vert != Candidate_list.end() && !(*vert).second)
-			{
+			if (vert != Candidate_list.end() && !(*vert).second) {
  				flag = false;
-				for (auto &w : H_set[i].first.vertices)
-				{
-					if (w != H_set[i].second)
-					{
+				for (auto &w : H_set[i].first.vertices) {
+					if (w != H_set[i].second) {
 						if (Candidate_list.find(w)!= Candidate_list.end())
 							flag = true;
 					}
 				
 				}
-				if (!flag)
-				{
+				if (!flag) {
 					(*vert).second = true;
 				}
 				else
@@ -280,12 +228,10 @@ list<Vertex_set> Search_of_G_set(Vertex_set &vset)
 	for (int i = 0; i < H_set.size(); i++)
 	{
 		auto vert = Candidate_list.find(H_set[i].second);
-		if (vert != Candidate_list.end())
-		{
+		if (vert != Candidate_list.end()) {
 			res_collection.push_back(H_set[i].first);
 		}
 	}
 
 	return res_collection;
-
 }
