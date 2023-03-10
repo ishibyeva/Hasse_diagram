@@ -26,9 +26,10 @@ int main() {
 	std::vector<std::vector<size_t>> vector_formatted_data = ReadDataFromFile(infile);
 
     Interface_KP kp_facets(vector_formatted_data);
-	Interface_FR fr_facets(vector_formatted_data);
+	Interface_FR fr_facets_rbtree(vector_formatted_data);
+	Interface_FR fr_facets_spectree(vector_formatted_data);
 
-	fr_facets.ConvertToData();
+	fr_facets_rbtree.ConvertToData();
 
     return 0;
 }

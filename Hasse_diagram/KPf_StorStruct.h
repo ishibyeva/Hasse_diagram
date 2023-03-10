@@ -56,7 +56,6 @@ extern list<Vertex_set> Q;
 
 
 void First_Act(int f_dim);
-void Vert_List_Building(string str);
 void Facet_List_Building(int f_dim);
 list<Vertex_set> Search_of_G_set(Vertex_set &vset);
 
