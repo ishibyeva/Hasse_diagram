@@ -1,9 +1,8 @@
-
 #include "SpecialTree.h"
 
-VecNode* newNode(vector<bool> data)
+VecNode *newNode(vector<bool> data)
 {
-	VecNode* temp = new VecNode;
+	VecNode *temp = new VecNode;
 
 	temp->Data = data;
 	temp->Left = nullptr;
@@ -15,14 +14,13 @@ VecNode* newNode(vector<bool> data)
 SpecialTree::SpecialTree()
 {
 	root = nullptr;
-	
 }
 bool SpecialTree::Search(vector<bool> s_elem)
 {
-	if (root== nullptr)
+	if (root == nullptr)
 		return false;
 	int i = 0;
-	VecNode* cur = root;
+	VecNode *cur = root;
 	while (i != s_elem.size())
 	{
 		if (s_elem[i] == true)
@@ -30,7 +28,6 @@ bool SpecialTree::Search(vector<bool> s_elem)
 			cur = cur->Right;
 			if (cur == NULL)
 				return false;
-
 		}
 		else
 		{
@@ -46,8 +43,8 @@ bool SpecialTree::Search(vector<bool> s_elem)
 void SpecialTree::Insert(vector<bool> in_elem)
 {
 	int i = 0;
-	VecNode* cur;
-	VecNode* newnode;
+	VecNode *cur;
+	VecNode *newnode;
 	vector<bool> mid_vec;
 	if (root == nullptr)
 	{
@@ -62,7 +59,7 @@ void SpecialTree::Insert(vector<bool> in_elem)
 		mid_vec.push_back(in_elem[i]);
 		if (in_elem[i] == true)
 		{
-			
+
 			if (cur->Right == nullptr)
 			{
 				newnode = newNode(mid_vec);
@@ -72,7 +69,7 @@ void SpecialTree::Insert(vector<bool> in_elem)
 		}
 		else
 		{
-			
+
 			if (cur->Left == nullptr)
 			{
 				newnode = newNode(mid_vec);
@@ -84,7 +81,7 @@ void SpecialTree::Insert(vector<bool> in_elem)
 		i++;
 	}
 }
-void SpecialTree::DestroyTree(VecNode* node)
+void SpecialTree::DestroyTree(VecNode *node)
 {
 	if (node)
 	{
@@ -93,5 +90,3 @@ void SpecialTree::DestroyTree(VecNode* node)
 		delete node;
 	}
 }
-
-

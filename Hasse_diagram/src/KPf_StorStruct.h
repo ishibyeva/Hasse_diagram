@@ -13,50 +13,49 @@
 
 using namespace std;
 
-class Facet_set {
+class Facet_set
+{
 public:
-	list<size_t> facet;
+	std::list<size_t> facet;
 
 	Facet_set();
-	Facet_set(list<size_t> vlist);
+	Facet_set(std::list<size_t> vlist);
 	void Print_Facet();
 	size_t Get_size();
 	~Facet_set();
 };
 
-
-class Vertex_set { 
+class Vertex_set
+{
 public:
-	
-	list<size_t> vertices;
+	std::list<size_t> vertices;
 
 	Vertex_set();
-	Vertex_set(list<size_t> vlist);
-	Facet_set F_operation(list<size_t> &lst);
-	Vertex_set Cl_operation(list<size_t> &lst);
+	Vertex_set(std::list<size_t> vlist);
+	Facet_set F_operation(std::list<size_t> &lst);
+	Vertex_set Cl_operation(std::list<size_t> &lst);
 	Facet_set F_operation();
 	Vertex_set Cl_operation();
 	void Print_vert();
 	size_t Get_size();
 	~Vertex_set();
-
 };
 
-struct H_Diag_Node {
+struct H_Diag_Node
+{
 	Vertex_set Vert_adrH;
 	Vertex_set Vert_adrG;
 };
 
-extern vector<list<size_t>> start_v_storage;
-extern vector<list<size_t>> start_f_storage;
-extern list<size_t> V_set;
+extern std::vector<list<size_t>> start_v_storage;
+extern std::vector<list<size_t>> start_f_storage;
+extern std::list<size_t> V_set;
 
-extern vector<H_Diag_Node> L;
-extern list<Vertex_set> Q;
-
+extern std::vector<H_Diag_Node> L;
+extern std::list<Vertex_set> Q;
 
 void First_Act(int f_dim);
 void Facet_List_Building(int f_dim);
-list<Vertex_set> Search_of_G_set(Vertex_set &vset);
+std::list<Vertex_set> Search_of_G_set(Vertex_set &vset);
 
 #endif

@@ -1,20 +1,20 @@
 #include "KPf_StorStruct.h"
 
-vector<list<size_t>> start_v_storage;
-vector<list<size_t>> start_f_storage;
-list<size_t> V_set;
-vector<H_Diag_Node> L;
-list<Vertex_set> Q;
+std::vector<list<size_t>> start_v_storage;
+std::vector<list<size_t>> start_f_storage;
+std::list<size_t> V_set;
+std::vector<H_Diag_Node> L;
+std::list<Vertex_set> Q;
 
 Vertex_set::Vertex_set() {
-	list<size_t> lst;
+	std::list<size_t> lst;
 	this->vertices = lst;
 }
 
 Vertex_set::~Vertex_set() {
 }
 
-Vertex_set::Vertex_set(list<size_t> vlist) : vertices(vlist) {
+Vertex_set::Vertex_set(std::list<size_t> vlist) : vertices(vlist) {
 }
 
 Facet_set::Facet_set() {
@@ -22,7 +22,7 @@ Facet_set::Facet_set() {
 	this->facet = lst;
 }
 
-Facet_set::Facet_set(list<size_t> vlist) : facet(vlist) {
+Facet_set::Facet_set(std::list<size_t> vlist) : facet(vlist) {
 }
 
 Facet_set::~Facet_set() {
@@ -47,7 +47,7 @@ void Vertex_set::Print_vert()
 
 void Facet_List_Building(int f_dim) {
 
-	for (int i = 0; i < start_v_storage.size(); i++)
+	for (size_t i = 0; i < start_v_storage.size(); i++)
 		V_set.push_back((size_t)(i+1));
 
 
@@ -55,7 +55,7 @@ void Facet_List_Building(int f_dim) {
 	{
 		list<size_t> temp;
 		size_t s_num = (size_t)(i + 1);
-		for (int j = 0; j < start_v_storage.size(); j++)
+		for (size_t j = 0; j < start_v_storage.size(); j++)
 		{
 			auto result = find(begin(start_v_storage[j]), end(start_v_storage[j]), s_num);
 			if (result != end(start_v_storage[j]))
@@ -204,7 +204,7 @@ list<Vertex_set> Search_of_G_set(Vertex_set &vset) {
 	for (auto &vert : H_set)
 		Candidate_list.insert(make_pair(vert.second, false));
 
-	for (int i = 0; i < H_set.size(); i++) {
+	for (size_t i = 0; i < H_set.size(); i++) {
 		auto vert = Candidate_list.find(H_set[i].second);
 			if (vert != Candidate_list.end() && !(*vert).second) {
  				flag = false;
@@ -225,7 +225,7 @@ list<Vertex_set> Search_of_G_set(Vertex_set &vset) {
 	}
 	
 
-	for (int i = 0; i < H_set.size(); i++)
+	for (size_t i = 0; i < H_set.size(); i++)
 	{
 		auto vert = Candidate_list.find(H_set[i].second);
 		if (vert != Candidate_list.end()) {

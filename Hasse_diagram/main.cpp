@@ -1,6 +1,6 @@
 #include <iterator>
 #include <sstream>
-#include </home/irina/diploma/Hasse_diagram/Hasse_diagram/UserInterface.h>
+#include <UserInterface.h>
 
 std::vector<std::vector<size_t>> ReadDataFromFile(std::istream& input) {
 
@@ -26,10 +26,19 @@ int main() {
 	std::vector<std::vector<size_t>> vector_formatted_data = ReadDataFromFile(infile);
 
     Interface_KP kp_facets(vector_formatted_data);
-	Interface_FR fr_facets_rbtree(vector_formatted_data);
-	Interface_FR fr_facets_spectree(vector_formatted_data);
+	Interface_FR_Standart fr_facets_rbtree(vector_formatted_data);
+	Interface_FR_Modern fr_facets_spectree(vector_formatted_data);
 
 	fr_facets_rbtree.ConvertToData();
+	fr_facets_spectree.ConvertToData();
+	kp_facets.ConvertToData();
+
+	// start enumeration section 
+	
+	fr_facets_rbtree.FindAllFace();
+	fr_facets_spectree.FindAllFace();
+	kp_facets.FindAllFace();
+
 
     return 0;
 }

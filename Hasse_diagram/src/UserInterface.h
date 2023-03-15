@@ -22,7 +22,7 @@ class Base_Interface
 protected:
     std::vector<std::vector<size_t>> data_;
     int v_num_, f_num_, dim_;
-    vector<list<pair<vector<bool>, set<int>>>> Diagramm_lvl;
+    std::vector<list<pair<vector<bool>, set<int>>>> Diagramm_lvl;
 
 public:
     Base_Interface(std::vector<std::vector<size_t>> &vector_form_data)
@@ -52,6 +52,8 @@ public:
     virtual ~Base_Interface(){};
 };
 
+typedef list<pair<vector<bool>, set<int>>> facet_list;
+
 class Interface_FR : public Base_Interface
 {
 public:
@@ -62,8 +64,8 @@ public:
         int facet_iterate = 0;
         for (auto &face : data_)
         {
-            vector<bool> binary_face(f_num_, false);
-            set<int> vertex;
+            std::vector<bool> binary_face(f_num_, false);
+            std::set<int> vertex;
             vertex.insert(facet_iterate++);
 
             for (auto &number : face)
@@ -74,34 +76,110 @@ public:
         }
     }
 
-    std::set<int> Get_New_Face(std::set<int> set1, std::set<int> set2)
+    std::vector<bool> FaceIntersection(std::vector<bool> &vec1, std::vector<bool> &vec2)
     {
-        std::set<int> intersection;
-        std::set_intersection(set1.begin(), set1.end(), set2.begin(), set2.end(),
-                              std::back_inserter(intersection));
-        return intersection;
+        std::vector<bool> int_vec;
+        for (int i = 0; i < f_num_; i++)
+            int_vec.push_back(vec1[i] && vec2[i]);
+        return int_vec;
     }
 
-    void InsertNewFace(std::variant<map<vector<bool>, set<int>> &, SpecialTree &> storage_struct,
-                       std::vector<bool> candidat)
+    std::set<int> GetNewFace(std::set<int> &set1, std::set<int> &set2)
     {
+        std::set<int> new_face(set1);
+        new_face.insert(set2.begin(), set2.end());
+        return new_face;
     }
 
-    list<pair<vector<bool>, set<int>>> Enumeration(list<pair<vector<bool>, set<int>>> &k_lvl,
-                                                   std::variant<map<vector<bool>, set<int>>, SpecialTree> storage_struct)
+    facet_list Enumeration(facet_list &k_lvl)
     {
-        list<pair<vector<bool>, set<int>>> k_plus1_lvl;
-        list<pair<vector<bool>, set<int>>>::iterator it = k_lvl.begin();
+    
+    }
+
+    void FindAllFace()
+    {
+        int k_layer = 0; // first layer of facet
+        while (k_layer != dim_)
+        {
+            facet_list &ref = Diagramm_lvl[k_layer];
+            Diagramm_lvl[k_layer + 1] = Enumeration(ref);
+            k_layer++;
+        }
+    }
+
+    void Output() override
+    {
+    }
+};
+
+class Interface_FR_Standart : public Interface_FR
+{
+    map<vector<bool>, set<int>> full_set;
+
+public:
+    Interface_FR_Standart(std::vector<std::vector<size_t>> &vector_form_data)
+        : Interface_FR(vector_form_data) {}
+    facet_list Enumeration(facet_list &k_lvl)
+    {
+        facet_list k_plus1_lvl;
+        facet_list::iterator it = k_lvl.begin();
 
         for (; (*it) != k_lvl.back(); it++)
         {
             for (auto j = it++; j != k_lvl.end(); j++)
             {
-                vector<bool> candidat = Face_Intersection((*it).first, (*j).first);
-                set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
+                std::vector<bool> candidat = FaceIntersection((*it).first, (*j).first);
+                std::set<int> candidat_vert = GetNewFace((*it).second, (*j).second);
                 if (full_set.find(candidat) == full_set.end())
                 {
+                    if (candidat == (*it).first)
+                    {
+                        it = k_lvl.erase(it);
+                    }
+                    if (candidat == (*j).first)
+                    {
+                        it = k_lvl.erase(j);
+                    }
+                    full_set.insert(make_pair(candidat, candidat_vert));
+                    k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+                }
+                else
+                {
+                    for (auto it = k_lvl.begin(); it != k_lvl.end();)
+                    {
+                        if ((*it).first == candidat)
+                            it = k_lvl.erase(it);
+                        else
+                            it++;
+                    }
+                    k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+                }
+            }
+        }
+        return k_plus1_lvl;
+    }
+};
 
+class Interface_FR_Modern : public Interface_FR
+{
+    std::shared_ptr<SpecialTree> sch_tree;
+
+public:
+    Interface_FR_Modern(std::vector<std::vector<size_t>> &vector_form_data)
+        : Interface_FR(vector_form_data) {}
+    facet_list Enumeration(facet_list &k_lvl)
+    {
+        facet_list k_plus1_lvl;
+        facet_list::iterator it = k_lvl.begin();
+
+        for (; (*it) != k_lvl.back(); it++)
+        {
+            for (auto j = it++; j != k_lvl.end(); j++)
+            {
+                vector<bool> candidat = FaceIntersection((*it).first, (*j).first);
+                set<int> candidat_vert = GetNewFace((*it).second, (*j).second);
+                if (sch_tree->Search(candidat))
+                {
                     if (candidat == (*it).first)
                     {
                         it = k_lvl.erase(it);
@@ -122,41 +200,12 @@ public:
                         else
                             it++;
                     }
-
+                    sch_tree->Insert(candidat);
                     k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
                 }
             }
         }
         return k_plus1_lvl;
-    }
-
-    void FRAlgorithmIteration(std::variant<map<vector<bool>, set<int>>, SpecialTree> storage_struct)
-    {
-        int k_layer = 0; // first layer of facet
-        while (k_layer != dim_)
-        {
-            list<pair<vector<bool>, set<int>>> &ref = HDiagramm_lvls[k_layer];
-            HDiagramm_lvls[k_layer + 1] = Enumeration(ref);
-            k_layer++;
-        }
-    }
-    void FindAllFace(bool type)
-    {
-        // type true = special tree, type false = red black tree realisation
-        if (type)
-        {
-            std::unique_ptr<SpecialTree> spec_tree(new SpecialTree());
-            FRAlgorithmIteration(std::move(spec_tree));
-        }
-        else
-        {
-            std::unique_ptr<vector<bool>, set<int>> rb_tree;
-            FRAlgorithmIteration(rb_tree);
-        }
-    }
-
-    void Output() override
-    {
     }
 };
 
@@ -169,7 +218,7 @@ public:
     {
         for (auto &face : data_)
         {
-            list<size_t> reserv;
+            std::list<size_t> reserv;
             for (auto &str_elem : face)
             {
                 reserv.push_back(str_elem);
@@ -180,7 +229,7 @@ public:
 
     void FindAllFace() override
     {
-        First_Act(f_num);
+        First_Act(f_num_);
         F_Tree *ftree = new F_Tree();
         list<Vertex_set> min_sets;
 
@@ -205,7 +254,7 @@ public:
         }
 
         list<size_t> full_set;
-        for (int i = 1; i <= v_num; i++)
+        for (int i = 1; i <= v_num_; i++)
             full_set.push_back((size_t)i);
         Vertex_set *backH = new Vertex_set(full_set);
 

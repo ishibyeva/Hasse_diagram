@@ -20,12 +20,12 @@ int v_num, f_num, dim;
 int k = 0;
 // 1 set - face set, 2 set - vertex set
 vector<list<pair<vector<bool>, set<int>>>> HDiagramm_lvls;
-map <vector<bool>, set<int>> full_set;
-SpecialTree* sch_tree = new SpecialTree();
-
+map<vector<bool>, set<int>> full_set;
+SpecialTree *sch_tree = new SpecialTree();
 
 // печать вершины
-void Print_Vertices(pair<vector<bool>, set<int>> sm_set) {
+void Print_Vertices(pair<vector<bool>, set<int>> sm_set)
+{
 	cout << '(';
 	for (auto i : sm_set.second)
 	{
@@ -36,146 +36,156 @@ void Print_Vertices(pair<vector<bool>, set<int>> sm_set) {
 	cout << ')';
 }
 
-vector<bool> Face_Intersection(vector<bool> vec1, vector<bool> vec2) {
+vector<bool> Face_Intersection(vector<bool> vec1, vector<bool> vec2)
+{
 	vector<bool> int_vec;
 	for (int i = 0; i < f_num; i++)
-	int_vec.push_back(vec1[i] && vec2[i]);
+		int_vec.push_back(vec1[i] && vec2[i]);
 	return int_vec;
 }
 
-// if vertices incedent - true 
-void Search_of_Edges(list<pair<vector<bool>, set<int>>> k_lvl, list<pair<vector<bool>, set<int>>> kplus_lvl) {
+// if vertices incedent - true
+void Search_of_Edges(list<pair<vector<bool>, set<int>>> k_lvl, list<pair<vector<bool>, set<int>>> kplus_lvl)
+{
 	for (auto i = k_lvl.begin(); i != k_lvl.end(); i++)
 	{
-	cout << "{";
-	Print_Vertices(*i);
-	cout << "}:	{";
-	for (auto j = kplus_lvl.begin(); j != kplus_lvl.end(); j++)
-	{
-		if ((*j).first == Face_Intersection((*i).first, (*j).first))
+		cout << "{";
+		Print_Vertices(*i);
+		cout << "}:	{";
+		for (auto j = kplus_lvl.begin(); j != kplus_lvl.end(); j++)
 		{
-			Print_Vertices(*j);
-			cout << ",";
+			if ((*j).first == Face_Intersection((*i).first, (*j).first))
+			{
+				Print_Vertices(*j);
+				cout << ",";
+			}
 		}
-	}
-	cout << '\b';
-	cout << "}";
-	cout << "\n";
+		cout << '\b';
+		cout << "}";
+		cout << "\n";
 	}
 }
 
-set<int> Get_New_Face(set<int> st1, set<int> st2) {
+set<int> Get_New_Face(set<int> st1, set<int> st2)
+{
 	set<int> st3;
 	st3 = st1;
 	st3.insert(st2.begin(), st2.end());
 	return st3;
 }
-// realization with RBT 
-list<pair<vector<bool>, set<int>>> Face_Enumeration_1(list<pair<vector<bool>, set<int>>> &k_lvl) {
+// realization with RBT
+list<pair<vector<bool>, set<int>>> Face_Enumeration_1(list<pair<vector<bool>, set<int>>> &k_lvl)
+{
 
 	list<pair<vector<bool>, set<int>>> k_plus1_lvl;
 
 	list<pair<vector<bool>, set<int>>>::iterator it = k_lvl.begin();
 
-	for (; (*it)!=k_lvl.back(); it++)
+	for (; (*it) != k_lvl.back(); it++)
 	{
-	for (auto j = it++; j!= k_lvl.end(); j++)
-	{
-		vector<bool> candidat = Face_Intersection((*it).first,(*j).first);
-		set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
-		if (full_set.find(candidat) == full_set.end())
+		for (auto j = it++; j != k_lvl.end(); j++)
 		{
-
-			if (candidat == (*it).first)
+			vector<bool> candidat = Face_Intersection((*it).first, (*j).first);
+			set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
+			if (full_set.find(candidat) == full_set.end())
 			{
-				it=k_lvl.erase(it);
-			}
-			if (candidat == (*j).first)
-			{
-				j=k_lvl.erase(j);
-			}
-			full_set.insert(make_pair(candidat, candidat_vert));
-			k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
 
+				if (candidat == (*it).first)
+				{
+					it = k_lvl.erase(it);
+				}
+				if (candidat == (*j).first)
+				{
+					j = k_lvl.erase(j);
+				}
+				full_set.insert(make_pair(candidat, candidat_vert));
+				k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+			}
+			else
+			{
+				for (auto it = k_lvl.begin(); it != k_lvl.end();)
+				{
+					if ((*it).first == candidat)
+						k_lvl.erase(it);
+					else
+						it++;
+				}
+
+				k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+			}
 		}
-		else
-		{
-			for (auto it = k_lvl.begin(); it != k_lvl.end();)
-			{
-				if ( (*it).first == candidat)
-					k_lvl.erase(it);
-				else it++;
-			}
-
-			k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
-		}
-	}
 	}
 	return k_plus1_lvl;
 }
 
-//realization with special search structure 
-list<pair<vector<bool>, set<int>>> Face_Enumeration_2(list<pair<vector<bool>, set<int>>> & k_lvl) {
+// realization with special search structure
+list<pair<vector<bool>, set<int>>> Face_Enumeration_2(list<pair<vector<bool>, set<int>>> &k_lvl)
+{
 
 	list<pair<vector<bool>, set<int>>> k_plus1_lvl;
 	list<pair<vector<bool>, set<int>>>::iterator it = k_lvl.begin();
 
 	for (; (*it) != k_lvl.back(); it++)
 	{
-	for (auto j = it++; j != k_lvl.end(); j++)
-	{
-		vector<bool> candidat = Face_Intersection((*it).first, (*j).first);
-		set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
-		if (full_set.find(candidat) == full_set.end())
+		for (auto j = it++; j != k_lvl.end(); j++)
 		{
+			vector<bool> candidat = Face_Intersection((*it).first, (*j).first);
+			set<int> candidat_vert = Get_New_Face((*it).second, (*j).second);
+			if (full_set.find(candidat) == full_set.end())
+			{
 
-			if (candidat == (*it).first)
-			{
-				it=k_lvl.erase(it);
-			}
-			if (candidat == (*j).first)
-			{
-				it=k_lvl.erase(j);
-			}
-			sch_tree->Insert(candidat);
-			k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
-
-		}
-		else
-		{
-			for (auto it = k_lvl.begin(); it != k_lvl.end(); )
-			{
-				if ((*it).first == candidat)
+				if (candidat == (*it).first)
+				{
 					it = k_lvl.erase(it);
-				else it++;
+				}
+				if (candidat == (*j).first)
+				{
+					it = k_lvl.erase(j);
+				}
+				sch_tree->Insert(candidat);
+				k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
 			}
+			else
+			{
+				for (auto it = k_lvl.begin(); it != k_lvl.end();)
+				{
+					if ((*it).first == candidat)
+						it = k_lvl.erase(it);
+					else
+						it++;
+				}
 
-			k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+				k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+			}
 		}
-	}
 	}
 	return k_plus1_lvl;
 }
 
-void View_Element_EmptySet() {
+void View_Element_EmptySet()
+{
 	cout << "{ }:	{";
 	int i = 1;
-	while (i != v_num + 1) {
-	cout << "( " << i++ << " ),";
+	while (i != v_num + 1)
+	{
+		cout << "( " << i++ << " ),";
 	}
 	cout << "}\n";
 }
 
-void View_Element_FullSet(list<pair<vector<bool>, set<int>>> fll_st) {
+void View_Element_FullSet(list<pair<vector<bool>, set<int>>> fll_st)
+{
 	cout << "dim " << dim << ":\n";
 	cout << "{";
 	Print_Vertices(fll_st.front());
 	cout << "}:	{ }\n";
 }
 
-void Build_Face_Set(bool struc_ind) {
-	while (k != dim) {
-		list<pair<vector<bool>, set<int>>> & ref = HDiagramm_lvls[k];
+void Build_Face_Set(bool struc_ind)
+{
+	while (k != dim)
+	{
+		list<pair<vector<bool>, set<int>>> &ref = HDiagramm_lvls[k];
 		if (struc_ind)
 			HDiagramm_lvls[k + 1] = Face_Enumeration_2(ref);
 		else
@@ -185,11 +195,13 @@ void Build_Face_Set(bool struc_ind) {
 }
 
 // build special lists of incedence for H diagramm
-void Build_Diagramm(bool struct_ind) {
+void Build_Diagramm(bool struct_ind)
+{
 	Build_Face_Set(struct_ind);
 	k = 0;
 	View_Element_EmptySet();
-	while (k != dim) {
+	while (k != dim)
+	{
 		cout << "dim " << k << ":\n";
 		Search_of_Edges(HDiagramm_lvls[k], HDiagramm_lvls[k + 1]);
 		k++;
@@ -197,24 +209,24 @@ void Build_Diagramm(bool struct_ind) {
 	View_Element_FullSet(HDiagramm_lvls[dim]);
 }
 
-void KP_Algorithm() {
+void KP_Algorithm()
+{
 	First_Act(f_num);
-	F_Tree* ftree = new F_Tree();
+	F_Tree *ftree = new F_Tree();
 	list<Vertex_set> min_sets;
-
 
 	while (!Q.empty())
 	{
-	min_sets = Search_of_G_set(Q.front());
-	Vertex_set Q_pop = Q.front();
+		min_sets = Search_of_G_set(Q.front());
+		Vertex_set Q_pop = Q.front();
 
 		while (!min_sets.empty())
 		{
 			if (!ftree->Search(min_sets.front()))
 			{
-				Vertex_set* copy = new Vertex_set(min_sets.front());
+				Vertex_set *copy = new Vertex_set(min_sets.front());
 				ftree->Insert(*copy);
-				H_Diag_Node New_node = { Q_pop, *copy };
+				H_Diag_Node New_node = {Q_pop, *copy};
 				L.push_back(New_node);
 				Q.push_back(*copy);
 			}
@@ -223,35 +235,37 @@ void KP_Algorithm() {
 		Q.pop_front();
 	}
 
-
 	list<size_t> full_set;
 	for (int i = 1; i <= v_num; i++)
 		full_set.push_back((size_t)i);
-	Vertex_set* backH = new Vertex_set(full_set);
+	Vertex_set *backH = new Vertex_set(full_set);
 
-	H_Diag_Node back_pair = {*backH,*backH};
+	H_Diag_Node back_pair = {*backH, *backH};
 	L.push_back(back_pair);
 }
 
-std::vector<std::vector<size_t>> ReadDataFromFile(std::istream& input) {
+std::vector<std::vector<size_t>> ReadDataFromFile(std::istream &input)
+{
 
 	std::vector<std::vector<size_t>> result_data_vector;
 	std::string line;
-    while (std::getline(input, line))
-    {
-        std::istringstream line_stream(line);
+	while (std::getline(input, line))
+	{
+		std::istringstream line_stream(line);
 
-        result_data_vector.emplace_back(std::istream_iterator<size_t>(line_stream),
-                           std::istream_iterator<size_t>());
+		result_data_vector.emplace_back(std::istream_iterator<size_t>(line_stream),
+										std::istream_iterator<size_t>());
 	}
 
 	return result_data_vector;
 }
 
-int main() {
-	cout << "Enter filename" << "\n";
+int main()
+{
+	cout << "Enter filename"
+		 << "\n";
 	string filename;
-	std::cin >> filename; 
+	std::cin >> filename;
 
 	std::ifstream infile(filename);
 
@@ -261,7 +275,7 @@ int main() {
 	vector<bool> rez_face_set;
 	set<int> vertex;
 	int i = 0;
-	//enter matrix
+	// enter matrix
 	while (std::getline(infile, line))
 	{
 		if (line.find_first_not_of(' ') != std::string::npos)
@@ -282,7 +296,8 @@ int main() {
 				rez_face_set.clear();
 				rez_face_set.resize(f_num);
 				vertex.insert(i - 2);
-				int str_pars = 0; string inc_num;
+				int str_pars = 0;
+				string inc_num;
 				while (line[str_pars] != '\0')
 				{
 					inc_num = inc_num + line[str_pars];
@@ -299,30 +314,29 @@ int main() {
 		i++;
 	}
 
-
 	// start timing 1
 	clock_t start_time = clock();
 	// if bool false - use standart structure
 
-	//Build_Diagramm(false);
+	// Build_Diagramm(false);
 
 	clock_t end_time = clock();
 	clock_t search_time1 = end_time - start_time;
 	// end timing 1
-	//start timing 2
+	// start timing 2
 	k = 0;
 	// clean vector of faces
 	HDiagramm_lvls.erase(HDiagramm_lvls.begin() + 1, HDiagramm_lvls.end());
 	HDiagramm_lvls.resize(dim + 1);
 	cout << "____________________________\n\n";
 	start_time = clock();
-	// if bool true - use special structure 
+	// if bool true - use special structure
 
-	//Build_Diagramm(true);
+	// Build_Diagramm(true);
 
 	end_time = clock();
 	clock_t search_time2 = end_time - start_time;
-	//end timing 2
+	// end timing 2
 	start_time = clock();
 	KP_Algorithm();
 	cout << "____________________________\n\n";
@@ -348,7 +362,8 @@ int main() {
 
 		for (int i = start; i < k1; i++)
 		{
-			cout << "(" << i + 1 << ")" << "Verts:";
+			cout << "(" << i + 1 << ")"
+				 << "Verts:";
 			L[i].Vert_adrG.Print_vert();
 			cout << "---->{ ";
 			for (int j = k1; j < k2; j++)
@@ -366,7 +381,7 @@ int main() {
 				if (flag)
 					cout << " (" << j + 1 << ") ";
 			}
-			cout << "}" << '\n'; 
+			cout << "}" << '\n';
 		}
 	}
 
@@ -375,16 +390,14 @@ int main() {
 	cout << "---->{ }" << '\n';
 	end_time = clock();
 
-	//end timing 3
+	// end timing 3
 	clock_t search_time3 = (end_time - start_time);
-
 
 	cout << "____________________________\n";
 	cout << filename << '\n';
 	cout << "____________________________\n";
 
-	cout << "First algorithm with Standart RBT: " << (float)search_time1<<"\n";
-	cout << "First algorithm with Special search tree structure: " << (float)search_time2<< "\n";
+	cout << "First algorithm with Standart RBT: " << (float)search_time1 << "\n";
+	cout << "First algorithm with Special search tree structure: " << (float)search_time2 << "\n";
 	cout << "Keibel and Pfetsch modern algorithm: " << (float)search_time3 << "\n";
-
 }

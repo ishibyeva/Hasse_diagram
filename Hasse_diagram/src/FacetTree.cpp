@@ -1,11 +1,8 @@
-#include "pch.h"
 #include "FacetTree.h"
-
 
 F_Tree::F_Tree()
 {
-	
-	Vertex_set* root_list = new Vertex_set({});
+	Vertex_set* root_list = new Vertex_set();
 	FT_Node* v_nd = new FT_Node(*root_list);
 	root = v_nd;
 }
@@ -40,7 +37,7 @@ void F_Tree::Insert(Vertex_set &vst)
 			
 			if (root->edges.find(*cur_l.begin()) == root->edges.end())
 			{
-				Vertex_set* buff = new Vertex_set({});
+				Vertex_set* buff = new Vertex_set();
 				FT_Node* new_node = new FT_Node(*buff);
 				new_node->Add_MinSet(*buff);
 				cur->Add_Child(cur_l.front(), new_node);
@@ -68,7 +65,7 @@ void F_Tree::Insert(Vertex_set &vst)
 		{
 			if (cur->edges.find(it) == cur->edges.end())
 			{
-				Vertex_set* buff = new Vertex_set({});
+				Vertex_set* buff = new Vertex_set();
 				FT_Node* new_node = new FT_Node(*buff);
 				cur->Add_Child(it, new_node);
 			}
