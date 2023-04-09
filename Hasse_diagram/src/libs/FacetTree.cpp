@@ -12,10 +12,11 @@ F_Tree::~F_Tree()
 	Destroy_Tree(root);
 }
 
-void F_Tree::Insert(Vertex_set &vst)
+void F_Tree::Insert(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_storage,
+					std::vector<std::list<size_t>> &start_f_storage)
 {
 	FT_Node* cur = root;
-	list<size_t> cur_l = vst.vertices;
+	std::list<size_t> cur_l = vst.vertices;
 	if (cur_l.size() < 3)
 	{
 		if (vst.vertices.size()==1)
@@ -54,10 +55,11 @@ void F_Tree::Insert(Vertex_set &vst)
 		cur_l.sort();
 		Vertex_set CS;
 		CS.vertices.push_back(*cur_l.begin());
-		list<size_t>::iterator it = cur_l.begin()++;
+		std::list<size_t>::iterator it = cur_l.begin()++;
 		for (; it != cur_l.end(); it++)
 		{
-			if (CS.Cl_operation().Get_size() < CS.Cl_operation(start_v_storage[*it-1]).Get_size())
+			if (CS.Cl_operation(start_v_storage, start_f_storage).Get_size() <
+				CS.Cl_operation(start_v_storage[*it - 1], start_v_storage, start_f_storage).Get_size())
 				CS.vertices.push_back(*it);
 		}
 
@@ -74,15 +76,14 @@ void F_Tree::Insert(Vertex_set &vst)
 		cur->Add_MinSet(vst);
 
 	}
-		
-	
 }
-bool F_Tree::Search(Vertex_set &vst)
+bool F_Tree::Search(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_storage,
+					std::vector<std::list<size_t>> &start_f_storage)
 {
 	if (root->edges.empty())
 		return false;
 	FT_Node* current = root;
-	list<size_t> cur_l = vst.vertices;
+	std::list<size_t> cur_l = vst.vertices;
 	if (vst.vertices.size() < 3)
 	{
 		for (auto &it : cur_l)
@@ -101,10 +102,11 @@ bool F_Tree::Search(Vertex_set &vst)
 		cur_l.sort();
 		Vertex_set CS;
 		CS.vertices.push_back(*cur_l.begin());
-		list<size_t>::iterator it = cur_l.begin()++;
+		std::list<size_t>::iterator it = cur_l.begin()++;
 		for (; it != cur_l.end(); it++)
 		{
-			if (CS.Cl_operation().Get_size() < CS.Cl_operation(start_v_storage[*it - 1]).Get_size())
+			if (CS.Cl_operation(start_v_storage, start_f_storage).Get_size() <
+				CS.Cl_operation(start_v_storage[*it - 1], start_v_storage, start_f_storage).Get_size())
 				CS.vertices.push_back(*it);
 		}
 		for (auto &it : CS.vertices)
@@ -123,14 +125,12 @@ void F_Tree::Destroy_Tree(FT_Node* root)
 {
 	if (root)
 	{
-		map<size_t, FT_Node*>::iterator it;
+		std::map<size_t, FT_Node*>::iterator it;
 		for (it = root->edges.begin(); it != root->edges.end(); it++)
 		{
 			Destroy_Tree((*it).second);
 			root->edges.erase(++it);
 		}
-
-		
 		delete root;
 	}
 }

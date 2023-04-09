@@ -10,8 +10,7 @@
 #include <unordered_map>
 #include <stdlib.h>
 #include <string>
-
-using namespace std;
+#include <memory>
 
 class Facet_set
 {
@@ -32,10 +31,12 @@ public:
 
 	Vertex_set();
 	Vertex_set(std::list<size_t> vlist);
-	Facet_set F_operation(std::list<size_t> &lst);
-	Vertex_set Cl_operation(std::list<size_t> &lst);
-	Facet_set F_operation();
-	Vertex_set Cl_operation();
+	Facet_set F_operation(std::list<size_t> &lst, std::vector<std::list<size_t>> &start_v_storage);
+	Vertex_set Cl_operation(std::list<size_t> &lst, std::vector<std::list<size_t>> &start_v_storage,
+							std::vector<std::list<size_t>> &start_f_storage);
+	Facet_set F_operation(std::vector<std::list<size_t>> &start_v_storage);
+	Vertex_set Cl_operation(std::vector<std::list<size_t>> &start_v_storage,
+							std::vector<std::list<size_t>> &start_f_storage);
 	void Print_vert();
 	size_t Get_size();
 	~Vertex_set();
@@ -47,15 +48,15 @@ struct H_Diag_Node
 	Vertex_set Vert_adrG;
 };
 
-extern std::vector<list<size_t>> start_v_storage;
-extern std::vector<list<size_t>> start_f_storage;
-extern std::list<size_t> V_set;
-
-extern std::vector<H_Diag_Node> L;
-extern std::list<Vertex_set> Q;
-
-void First_Act(int f_dim);
-void Facet_List_Building(int f_dim);
-std::list<Vertex_set> Search_of_G_set(Vertex_set &vset);
+void First_Act(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
+			   std::vector<std::list<size_t>> &start_f_storage,
+			   std::list<size_t> &V_set,
+			   std::list<Vertex_set> &Q);
+void Facet_List_Building(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
+						 std::vector<std::list<size_t>> &start_f_storage,
+						 std::list<size_t> &V_set);
+std::list<Vertex_set> Search_of_G_set(Vertex_set &vset, std::vector<std::list<size_t>> &start_v_storage,
+									  std::vector<std::list<size_t>> &start_f_storage,
+									  std::list<size_t> &V_set);
 
 #endif

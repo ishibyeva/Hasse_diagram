@@ -2,32 +2,25 @@
 #define _MYINCL1_H
 
 #include <vector>
-
-using namespace std;
-
-struct VecNode
-{
-	vector<bool> Data;
-	VecNode* Left;
-	VecNode* Right;
-};
-
+#include <memory>
 
 class SpecialTree
 {
-	VecNode* root;
+	struct VecNode
+	{
+		std::vector<bool> Data;
+		std::unique_ptr<VecNode> Left;
+		std::unique_ptr<VecNode> Right;
+		explicit VecNode(const std::vector<bool> &val) : Data(val) {}
+	};
+	std::unique_ptr<VecNode> root;
 
 public:
 	SpecialTree();
-	bool Search(vector<bool> s_elem);
-	void Insert(vector<bool> in_elem);
-	void DestroyTree(VecNode* node);
-	~SpecialTree() { DestroyTree(root); }
-
+	bool Search(std::vector<bool> s_elem);
+	void Insert(std::vector<bool> in_elem);
+	void DestroyTree(VecNode *node);
+	// ~SpecialTree() { DestroyTree(root); }
 };
-
-
-
-
 
 #endif

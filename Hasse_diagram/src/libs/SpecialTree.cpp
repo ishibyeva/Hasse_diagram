@@ -1,38 +1,28 @@
 #include "SpecialTree.h"
 
-VecNode *newNode(vector<bool> data)
-{
-	VecNode *temp = new VecNode;
-
-	temp->Data = data;
-	temp->Left = nullptr;
-	temp->Right = nullptr;
-
-	return temp;
-}
 
 SpecialTree::SpecialTree()
 {
 	root = nullptr;
 }
-bool SpecialTree::Search(vector<bool> s_elem)
+bool SpecialTree::Search(std::vector<bool> s_elem)
 {
 	if (root == nullptr)
 		return false;
-	int i = 0;
-	VecNode *cur = root;
+	size_t i = 0;
+	auto cur = root.get();
 	while (i != s_elem.size())
 	{
-		if (s_elem[i] == true)
+		if (s_elem[i])
 		{
-			cur = cur->Right;
-			if (cur == NULL)
+			cur = cur->Right.get();
+			if (cur == nullptr)
 				return false;
 		}
 		else
 		{
-			cur = cur->Left;
-			if (cur == NULL)
+			cur = cur->Left.get();
+			if (cur == nullptr)
 				return false;
 		}
 		i++;
@@ -40,53 +30,44 @@ bool SpecialTree::Search(vector<bool> s_elem)
 	return true;
 }
 
-void SpecialTree::Insert(vector<bool> in_elem)
+void SpecialTree::Insert(std::vector<bool> in_elem)
 {
-	int i = 0;
-	VecNode *cur;
-	VecNode *newnode;
-	vector<bool> mid_vec;
 	if (root == nullptr)
 	{
-		vector<bool> root_vec = {};
-		newnode = newNode(root_vec);
-		root = newnode;
+		root = std::make_unique<VecNode>(std::vector<bool>());
 	}
-
-	cur = root;
+	size_t i = 0;
+	std::vector<bool> mid_vec;
+	auto cur = root.get();
 	while (i != in_elem.size())
 	{
 		mid_vec.push_back(in_elem[i]);
-		if (in_elem[i] == true)
+		if (in_elem[i])
 		{
 
 			if (cur->Right == nullptr)
 			{
-				newnode = newNode(mid_vec);
-				cur->Right = newnode;
+				cur->Right = std::make_unique<VecNode>(mid_vec);
 			}
-			cur = cur->Right;
+			cur = cur->Right.get();
 		}
 		else
 		{
-
 			if (cur->Left == nullptr)
 			{
-				newnode = newNode(mid_vec);
-				cur->Left = newnode;
+				cur->Left = std::make_unique<VecNode>(mid_vec);
 			}
-			cur = cur->Left;
+			cur = cur->Left.get();
 		}
-
 		i++;
 	}
 }
-void SpecialTree::DestroyTree(VecNode *node)
-{
-	if (node)
-	{
-		DestroyTree(node->Left);
-		DestroyTree(node->Right);
-		delete node;
-	}
-}
+// void SpecialTree::DestroyTree(VecNode *node)
+// {
+// 	if (node)
+// 	{
+// 		DestroyTree(node->Left);
+// 		DestroyTree(node->Right);
+// 		delete node;
+// 	}
+// }

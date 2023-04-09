@@ -39,5 +39,7 @@ int main() {
 	fr_facets_spectree.FindAllFace();
 	kp_facets.FindAllFace();
 
+	kp_facets.Output();
+
     return 0;
 }
