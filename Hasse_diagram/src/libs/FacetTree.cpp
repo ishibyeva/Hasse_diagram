@@ -2,50 +2,48 @@
 
 F_Tree::F_Tree()
 {
-	Vertex_set* root_list = new Vertex_set();
-	FT_Node* v_nd = new FT_Node(*root_list);
-	root = v_nd;
+	root = std::make_unique<FT_Node>(std::make_shared<Vertex_set>());
 }
 
-F_Tree::~F_Tree()
-{
-	Destroy_Tree(root);
-}
+// F_Tree::~F_Tree()
+// {
+// 	Destroy_Tree(root);
+// }
 
-void F_Tree::Insert(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_storage,
+void F_Tree::Insert(std::shared_ptr<Vertex_set> vst, std::vector<std::list<size_t>> &start_v_storage,
 					std::vector<std::list<size_t>> &start_f_storage)
 {
-	FT_Node* cur = root;
-	std::list<size_t> cur_l = vst.vertices;
+	auto cur = root.get();
+	std::list<size_t> cur_l = vst->vertices;
 	if (cur_l.size() < 3)
 	{
-		if (vst.vertices.size()==1)
+		if (vst->vertices.size()==1)
 			{
 			if (root->edges.find(*cur_l.begin()) == root->edges.end())
 			{
-				FT_Node* new_node = new FT_Node(vst);
-				cur->Add_Child(cur_l.front(), new_node);
+				auto new_node = std::make_unique<FT_Node>(vst);
+				cur->Add_Child(cur_l.front(), std::move(new_node));
 			}
 			else
 			{
-				if (cur->C_S.vertices.empty())
+				if (cur->C_S->vertices.empty())
 					cur->Add_MinSet(vst);
 			}
 			}
 		
 		else
 		{
-			
 			if (root->edges.find(*cur_l.begin()) == root->edges.end())
 			{
-				Vertex_set* buff = new Vertex_set();
-				FT_Node* new_node = new FT_Node(*buff);
-				new_node->Add_MinSet(*buff);
-				cur->Add_Child(cur_l.front(), new_node);
+				auto buff = std::make_shared<Vertex_set>();
+				auto new_node = std::make_unique<FT_Node>(buff);
+				new_node->Add_MinSet(buff);
+				cur->Add_Child(cur_l.front(), std::move(new_node));
 			}
-			cur = cur->edges.find(*cur_l.begin())->second;
-			FT_Node* new_node = new FT_Node(vst);
-			cur->Add_Child(cur_l.back(), new_node);
+			cur = cur->edges.find(*cur_l.begin())->second.get();
+			// FT_Node* new_node = new FT_Node(vst);
+			auto new_node = std::make_unique<FT_Node>(vst);
+			cur->Add_Child(cur_l.back(), std::move(new_node));
 
 		}
 		
@@ -67,32 +65,32 @@ void F_Tree::Insert(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_sto
 		{
 			if (cur->edges.find(it) == cur->edges.end())
 			{
-				Vertex_set* buff = new Vertex_set();
-				FT_Node* new_node = new FT_Node(*buff);
-				cur->Add_Child(it, new_node);
+				// Vertex_set* buff = new Vertex_set();
+				auto new_node = std::make_unique<FT_Node>(std::make_shared<Vertex_set>());
+				cur->Add_Child(it, std::move(new_node));
 			}
-			cur = cur->edges.find(it)->second;
+			cur = cur->edges.find(it)->second.get();
 		}
 		cur->Add_MinSet(vst);
 
 	}
 }
-bool F_Tree::Search(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_storage,
+bool F_Tree::Search(std::list<size_t> &vst, std::vector<std::list<size_t>> &start_v_storage,
 					std::vector<std::list<size_t>> &start_f_storage)
 {
 	if (root->edges.empty())
 		return false;
-	FT_Node* current = root;
-	std::list<size_t> cur_l = vst.vertices;
-	if (vst.vertices.size() < 3)
+	auto current = root.get();
+	std::list<size_t> cur_l = vst;
+	if (vst.size() < 3)
 	{
 		for (auto &it : cur_l)
 		{
 			if (current->edges.empty() || current->edges.find(it) == current->edges.end())
 				return false;
-			current = current->edges.find(it)->second;
+			current = current->edges.find(it)->second.get();
 		}
-		if (current->GetCS() == vst.vertices)
+		if (current->GetCS() == vst)
 			return true;
 		else return false;
 
@@ -113,9 +111,9 @@ bool F_Tree::Search(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_sto
 		{
 			if (current->edges.empty() || current->edges.find(it) == current->edges.end())
 				return false;
-			current = current->edges.find(it)->second;
+			current = current->edges.find(it)->second.get();
 		}
-		if (current->GetCS() == vst.vertices)
+		if (current->GetCS() == vst)
 			return true;
 		else return false;
 	}
@@ -125,10 +123,10 @@ void F_Tree::Destroy_Tree(FT_Node* root)
 {
 	if (root)
 	{
-		std::map<size_t, FT_Node*>::iterator it;
+		std::map<size_t, std::unique_ptr<FT_Node>>::iterator it;
 		for (it = root->edges.begin(); it != root->edges.end(); it++)
 		{
-			Destroy_Tree((*it).second);
+			Destroy_Tree((*it).second.get());
 			root->edges.erase(++it);
 		}
 		delete root;

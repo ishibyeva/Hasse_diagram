@@ -31,13 +31,13 @@ int main() {
 
 	fr_facets_rbtree.ConvertToData();
 	fr_facets_spectree.ConvertToData();
-	kp_facets.ConvertToData();
+	// kp_facets.ConvertToData();
 
 	// start enumeration section 
 	
 	fr_facets_rbtree.FindAllFace();
 	fr_facets_spectree.FindAllFace();
-	kp_facets.FindAllFace();
+	// kp_facets.FindAllFace();
 
 	kp_facets.Output();
 

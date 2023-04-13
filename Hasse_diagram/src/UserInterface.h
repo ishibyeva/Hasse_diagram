@@ -241,8 +241,7 @@ public:
     void FindAllFace() override
     {
         First_Act(f_num_, start_v_storage, start_f_storage, V_set, Q);
-        F_Tree *ftree = new F_Tree();
-        // std::unique_ptr<F_Tree> ftree(new F_Tree());
+        auto ftree = std::make_unique<F_Tree>();
         std::list<Vertex_set> min_sets;
 
         while (!Q.empty())
@@ -252,10 +251,11 @@ public:
 
             while (!min_sets.empty())
             {
-                if (!ftree->Search(min_sets.front(), start_v_storage, start_f_storage))
+                if (!ftree->Search(min_sets.front().vertices, start_v_storage, start_f_storage))
                 {
-                    Vertex_set *copy = new Vertex_set(min_sets.front());
-                    ftree->Insert(*copy, start_v_storage, start_f_storage);
+                    // Vertex_set *copy = new Vertex_set(min_sets.front());
+                    auto copy = std::make_shared<Vertex_set>(min_sets.front());
+                    ftree->Insert(copy, start_v_storage, start_f_storage);
                     H_Diag_Node New_node = {Q_pop, *copy};
                     L.push_back(New_node);
                     Q.push_back(*copy);
@@ -266,9 +266,9 @@ public:
         }
 
         std::list<size_t> full_set;
-        for (int i = 1; i <= v_num_; i++)
-            full_set.push_back((size_t)i);
-        Vertex_set *backH = new Vertex_set(full_set);
+        for (size_t i = 1; i <= (size_t)v_num_; ++i)
+            full_set.push_back(i);
+        auto backH = std::make_unique<Vertex_set>(full_set); 
 
         H_Diag_Node back_pair = {*backH, *backH};
         L.push_back(back_pair);

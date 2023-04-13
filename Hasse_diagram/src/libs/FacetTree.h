@@ -5,18 +5,18 @@
 
 class FT_Node {
 public:
-	Vertex_set& C_S;
-	std::map<size_t, FT_Node*> edges;
+	std::shared_ptr<Vertex_set> C_S;
+	std::map<size_t, std::unique_ptr<FT_Node>> edges;
 
-	FT_Node(Vertex_set& vrt) : C_S(vrt) { C_S = vrt; };
-	void Add_Child(size_t num, FT_Node* ptr) {
-		edges.insert(std::make_pair(num,ptr));
+	FT_Node(std::shared_ptr<Vertex_set> vrt) : C_S(vrt) {};
+	void Add_Child(size_t num, std::unique_ptr<FT_Node> ptr) {
+		edges.insert(std::make_pair(num, std::move(ptr)));
 	};
-	void Add_MinSet(Vertex_set& new_cs) {
+	void Add_MinSet(std::shared_ptr<Vertex_set> new_cs) {
 		C_S = new_cs;
 	};
 	std::list<size_t> GetCS() {
-		return C_S.vertices;
+		return C_S->vertices;
 	};
 	~FT_Node() {};
 
@@ -24,15 +24,15 @@ public:
 
 class F_Tree {
 public:
-	FT_Node* root;
+	std::unique_ptr<FT_Node> root;
 
 	F_Tree();
-	void Insert(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_storage,
+	void Insert(std::shared_ptr<Vertex_set> vst, std::vector<std::list<size_t>> &start_v_storage,
 				std::vector<std::list<size_t>> &start_f_storage);
-	bool Search(Vertex_set &vst, std::vector<std::list<size_t>> &start_v_storage,
+	bool Search(std::list<size_t> &vst, std::vector<std::list<size_t>> &start_v_storage,
 				std::vector<std::list<size_t>> &start_f_storage);
 	void Destroy_Tree(FT_Node* root);
-	~F_Tree();
+	// ~F_Tree();
 };
 
 #endif
