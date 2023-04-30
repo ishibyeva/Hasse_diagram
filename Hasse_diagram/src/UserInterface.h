@@ -46,7 +46,7 @@ public:
     virtual void ConvertToData() = 0;
     virtual void FindAllFace() = 0;
     virtual void Output() = 0;
-    virtual ~Base_Interface(){};
+    virtual ~Base_Interface() = default;
 };
 
 typedef std::list<std::pair<std::vector<bool>, std::set<int>>> facet_list;
@@ -107,33 +107,42 @@ public:
         facet_list k_plus1_lvl;
         facet_list::iterator it;
 
-        for (it = k_lvl.begin(); it != k_lvl.end(); ++it)
+        for (it = k_lvl.begin(); (*it) != k_lvl.back(); ++it)
         {
             for (auto j = std::next(it); j != k_lvl.end(); ++j)
             {
-                std::vector<bool> candidat = FaceIntersection((*it).first, (*j).first);
-                std::set<int> candidat_vert = GetNewFace((*it).second, (*j).second);
+                bool delete_element = false;
+                std::vector<bool> candidat = FaceIntersection(it->first, j->first);
+                std::set<int> candidat_vert = GetNewFace(it->second, j->second);
                 if (full_set.find(candidat) == full_set.end())
                 {
-                    if (candidat == (*it).first)
+                    if (candidat == it->first)
                     {
-                        it = k_lvl.erase(it);
+                        delete_element = true;
+                        it--;
                     }
-                    if (candidat == (*j).first)
+                    if (candidat == j->first)
                     {
-                        it = k_lvl.erase(j);
+                        delete_element = true;
+                        j--;
                     }
                     full_set.insert(make_pair(candidat, candidat_vert));
                     k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
                 }
-                else
-                {
+                if (delete_element) {
                     auto remove_it = std::remove_if(k_lvl.begin(), k_lvl.end(),
                                                     [&](const std::pair<std::vector<bool>, std::set<int>> &element)
                                                     { return element.first == candidat; });
                     k_lvl.erase(remove_it, k_lvl.end());
-                    k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
                 }
+                // else
+                // {
+                //     auto remove_it = std::remove_if(k_lvl.begin(), k_lvl.end(),
+                //                                     [&](const std::pair<std::vector<bool>, std::set<int>> &element)
+                //                                     { return element.first == candidat; });
+                //     k_lvl.erase(remove_it, k_lvl.end());
+                //     k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
+                // }
             }
         }
         return k_plus1_lvl;
@@ -165,7 +174,7 @@ public:
         facet_list k_plus1_lvl;
         facet_list::iterator it;
 
-        for (it = k_lvl.begin(); it != k_lvl.end(); ++it)
+        for (it = k_lvl.begin(); (*it) != k_lvl.back(); ++it)
         {
             for (auto j = std::next(it); j != k_lvl.end(); ++j)
             {
@@ -179,7 +188,7 @@ public:
                     }
                     if (candidat == (*j).first)
                     {
-                        it = k_lvl.erase(j);
+                        j = k_lvl.erase(j);
                     }
                     sch_tree.Insert(candidat);
                     k_plus1_lvl.push_back(make_pair(candidat, candidat_vert));
@@ -266,7 +275,7 @@ public:
         }
 
         std::list<size_t> full_set;
-        for (size_t i = 1; i <= (size_t)v_num_; ++i)
+        for (size_t i = 1; i <= static_cast<size_t>(v_num_); ++i)
             full_set.push_back(i);
         auto backH = std::make_unique<Vertex_set>(full_set); 
 
