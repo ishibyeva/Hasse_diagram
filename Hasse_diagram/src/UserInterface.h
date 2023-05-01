@@ -35,13 +35,6 @@ public:
         : data_(data), v_num_(v_num), f_num_(f_num), dim_(dim)
     {
     }
-    Base_Interface(const Base_Interface &base_interface)
-    {
-        v_num_ = base_interface.v_num_;
-        f_num_ = base_interface.f_num_;
-        dim_ = base_interface.dim_;
-        data_ = base_interface.data_;
-    }
 
     virtual void ConvertToData() = 0;
     virtual void FindAllFace() = 0;
@@ -49,7 +42,7 @@ public:
     virtual ~Base_Interface() = default;
 };
 
-typedef std::list<std::pair<std::vector<bool>, std::set<int>>> facet_list;
+using facet_list = std::list<std::pair<std::vector<bool>, std::set<int>>>;
 
 class Interface_FR : public Base_Interface
 {
