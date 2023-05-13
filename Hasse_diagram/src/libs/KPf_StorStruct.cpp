@@ -10,7 +10,7 @@ Vertex_set::~Vertex_set()
 {
 }
 
-Vertex_set::Vertex_set(std::list<size_t>& vlist) : vertices(vlist)
+Vertex_set::Vertex_set(std::list<size_t> vlist) : vertices(vlist)
 {
 }
 

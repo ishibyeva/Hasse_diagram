@@ -31,7 +31,7 @@ public:
 
         std::copy(vector_form_data.begin() + 3, vector_form_data.end(), std::back_inserter(data_));
     }
-    Base_Interface(std::vector<std::vector<size_t>> data, int v_num, int f_num, int dim)
+    Base_Interface(std::vector<std::vector<size_t>> &data, int v_num, int f_num, int dim)
         : data_(data), v_num_(v_num), f_num_(f_num), dim_(dim)
     {
     }
@@ -217,14 +217,14 @@ public:
 
 class Interface_KP : public Base_Interface
 {
+public:
     std::vector<std::list<size_t>> start_v_storage;
     std::vector<std::list<size_t>> start_f_storage;
 
     std::list<size_t> V_set;
     std::vector<H_Diag_Node> L;
     std::list<Vertex_set> Q;
-
-public:
+    
     Interface_KP(std::vector<std::vector<size_t>> &vector_form_data)
         : Base_Interface(vector_form_data) {}
     void ConvertToData() override
@@ -274,6 +274,17 @@ public:
 
         H_Diag_Node back_pair = {*backH, *backH};
         L.push_back(back_pair);
+    }
+
+    std::vector<std::tuple<std::list<size_t>, std::list<size_t>>> GraphPostProcessing() {
+        // Function for Python wrapper to convert structure to sample type
+        std::vector<std::tuple<std::list<size_t>, std::list<size_t>>> standart_type_nodes;
+        for (auto &diag_node : L) {
+            auto H = diag_node.Vert_adrH.vertices;
+            auto G = diag_node.Vert_adrG.vertices;
+            standart_type_nodes.emplace_back(H, G);
+        }
+        return standart_type_nodes;
     }
 
     void Output() override

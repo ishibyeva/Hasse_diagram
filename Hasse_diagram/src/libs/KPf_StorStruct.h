@@ -19,7 +19,6 @@ public:
 
 	Facet_set();
 	Facet_set(std::list<size_t> vlist);
-	void Print_Facet();
 	size_t Get_size();
 	~Facet_set();
 };
@@ -30,7 +29,7 @@ public:
 	std::list<size_t> vertices;
 
 	Vertex_set();
-	Vertex_set(std::list<size_t>& vlist);
+	Vertex_set(std::list<size_t> vlist);
 	Vertex_set(const Vertex_set& v_set);
 	Facet_set F_operation(std::list<size_t> &lst, std::vector<std::list<size_t>> &start_v_storage);
 	Vertex_set Cl_operation(std::list<size_t> &lst, std::vector<std::list<size_t>> &start_v_storage,
