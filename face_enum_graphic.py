@@ -15,7 +15,8 @@ class FaceEnum():
         self.enumeration_interface.ConvertToData()
         self.is_enumerated = False
 
-    def read_from_file(self, path: Path) -> list:
+    @staticmethod
+    def read_from_file(path: Path) -> list[int]:
         result_data_vector = []
         with open(path, 'r') as fl:
             lines = fl.readlines()
@@ -27,24 +28,37 @@ class FaceEnum():
         """
         Run C++ implementation of face enumeration
         """
-        self.enumeration_interface.FindAllFace()
-        self.is_enumerated = True
+        if not self.is_enumerated:
+            self.enumeration_interface.FindAllFace()
+            self.is_enumerated = True
 
     def print_text_hasse_diagramm(self):
         """
         Print Hasse diagramm to console in text form
         """
-        if self.is_enumerated:
-            self.enumeration_interface.Output()
+        self.face_enumeration()
+        self.enumeration_interface.Output()
 
     def draw_hasse_diagram(self):
+        """
+        Process atom-coatom structure and build graph
+        """
+        self.face_enumeration()
         list_enterpretation = self.enumeration_interface.GraphPostProcessing()
-        graph_interpret = Digraph()
+        # list_enterpretation = list_enterpretation[:len(list_enterpretation)-1]
+        # list_enterpretation = sorted(list_enterpretation, key=lambda x: x[0])
+        graph_interpret = Digraph('Hasse_diagram', filename='hello.gv')
         for pair in list_enterpretation:
-            graph_interpret.edge(pair[0], pair[1])
+            h_node_string = ' '.join(str(x) for x in pair[0])
+            g_node_string = ' '.join(str(x) for x in pair[1])
+            graph_interpret.edge(h_node_string, g_node_string)
+
+
+        graph_interpret.view()
 
 
 if __name__ == "__main__":
-    test_face_enum = FaceEnum(Path.cwd() / 'Hasse_diagram' / 'examples' / 'sqr.txt')
+    test_face_enum = FaceEnum(Path.cwd() / 'Hasse_diagram' / 'examples' / 'pyr3.txt')
     test_face_enum.face_enumeration()
+    test_face_enum.print_text_hasse_diagramm()
     test_face_enum.draw_hasse_diagram()

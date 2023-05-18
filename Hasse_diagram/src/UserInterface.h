@@ -276,9 +276,10 @@ public:
         L.push_back(back_pair);
     }
 
-    std::vector<std::tuple<std::list<size_t>, std::list<size_t>>> GraphPostProcessing() {
+    using hasse_edge = std::tuple<std::list<size_t>, std::list<size_t>>;
+    std::vector<hasse_edge> GraphPostProcessing() {
         // Function for Python wrapper to convert structure to sample type
-        std::vector<std::tuple<std::list<size_t>, std::list<size_t>>> standart_type_nodes;
+        std::vector<hasse_edge> standart_type_nodes;
         for (auto &diag_node : L) {
             auto H = diag_node.Vert_adrH.vertices;
             auto G = diag_node.Vert_adrG.vertices;
@@ -289,7 +290,6 @@ public:
 
     void Output() override
     {
-        // size_t fin_size = L[L.size() - 2].Vert_adrG.Get_size();
         size_t k1 = 0, k2 = 0, start = 0;
         while (k2 != L.size())
         {
