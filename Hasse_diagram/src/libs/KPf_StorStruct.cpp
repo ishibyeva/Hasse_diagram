@@ -55,7 +55,8 @@ void Vertex_set::Print_vert()
 void Facet_List_Building(int f_dim,
 						 std::vector<std::list<size_t>> &start_v_storage,
 						 std::vector<std::list<size_t>> &start_f_storage,
-						 std::list<size_t> &V_set)
+						 std::list<size_t> &V_set,
+						 std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store)
 {
 	for (size_t i = 0; i < start_v_storage.size(); i++)
 		V_set.push_back((size_t)(i + 1));
@@ -189,11 +190,13 @@ Facet_set Vertex_set::F_operation(std::vector<std::list<size_t>> &start_v_storag
 void First_Act(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
 			   std::vector<std::list<size_t>> &start_f_storage,
 			   std::list<size_t> &V_set,
-			   std::list<Vertex_set> &Q)
+			   std::list<Vertex_set> &Q,
+			   std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store)
 {
-	Facet_List_Building(f_dim, start_v_storage, start_f_storage, V_set);
+	Facet_List_Building(f_dim, start_v_storage, start_f_storage, V_set, dimersation_store);
 	std::list<size_t> vert_l = {};
-	Q.push_back(vert_l);
+	Q.emplace_back();
+	dimersation_store.emplace(std::make_pair(Vertex_set(), 0));
 }
 
 std::vector<std::pair<Vertex_set, size_t>> Compute_H_Collection(Vertex_set &vset,

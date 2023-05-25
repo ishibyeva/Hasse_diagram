@@ -39,11 +39,18 @@ PYBIND11_MODULE(face_enumeration, m)
         .def_readwrite("V_set", &Interface_KP::V_set)
         .def_readwrite("L", &Interface_KP::L)
         .def_readwrite("Q", &Interface_KP::Q)
+        .def_readwrite("dimersation_store", &Interface_KP::dimersation_store)
         .def("ConvertToData", &Interface_KP::ConvertToData)
         .def("FindAllFace", &Interface_KP::FindAllFace)
-        .def("Output", &Interface_KP::Output)
-        .def("GraphPostProcessing", &Interface_KP::GraphPostProcessing);
+        .def("Output", &Interface_KP::Output);
+
+    py::class_<Vertex_set>(m, "Vertex_set")
+        .def(py::init<std::list<size_t>>())
+        .def(py::init<const Vertex_set&>())
+        .def_readonly("vertices", &Vertex_set::vertices);
 
     py::class_<H_Diag_Node>(m, "H_Diag_Node")
-        .def(py::init<Vertex_set, Vertex_set>());
+        .def(py::init<Vertex_set, Vertex_set>())
+        .def_readonly("Vert_adrG", &H_Diag_Node::Vert_adrG)
+        .def_readonly("Vert_adrH", &H_Diag_Node::Vert_adrH);
 }

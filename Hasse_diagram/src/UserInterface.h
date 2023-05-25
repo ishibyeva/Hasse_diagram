@@ -224,6 +224,8 @@ public:
     std::list<size_t> V_set;
     std::vector<H_Diag_Node> L;
     std::list<Vertex_set> Q;
+
+    std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> dimersation_store;
     
     Interface_KP(std::vector<std::vector<size_t>> &vector_form_data)
         : Base_Interface(vector_form_data) {}
@@ -242,7 +244,7 @@ public:
 
     void FindAllFace() override
     {
-        First_Act(f_num_, start_v_storage, start_f_storage, V_set, Q);
+        First_Act(f_num_, start_v_storage, start_f_storage, V_set, Q, dimersation_store);
         auto ftree = std::make_unique<F_Tree>();
         std::list<Vertex_set> min_sets;
 
@@ -255,12 +257,13 @@ public:
             {
                 if (!ftree->Search(min_sets.front().vertices, start_v_storage, start_f_storage))
                 {
-                    // Vertex_set *copy = new Vertex_set(min_sets.front());
                     auto copy = std::make_shared<Vertex_set>(min_sets.front());
                     ftree->Insert(copy, start_v_storage, start_f_storage);
                     H_Diag_Node New_node = {Q_pop, *copy};
                     L.push_back(New_node);
                     Q.push_back(*copy);
+                    auto facet_dim = dimersation_store.find(Q_pop);
+                    dimersation_store.emplace(std::make_pair(*copy, facet_dim->second + 1));
                 }
                 min_sets.pop_front();
             }
@@ -274,18 +277,6 @@ public:
 
         H_Diag_Node back_pair = {*backH, *backH};
         L.push_back(back_pair);
-    }
-
-    using hasse_edge = std::tuple<std::list<size_t>, std::list<size_t>>;
-    std::vector<hasse_edge> GraphPostProcessing() {
-        // Function for Python wrapper to convert structure to sample type
-        std::vector<hasse_edge> standart_type_nodes;
-        for (auto &diag_node : L) {
-            auto H = diag_node.Vert_adrH.vertices;
-            auto G = diag_node.Vert_adrG.vertices;
-            standart_type_nodes.emplace_back(H, G);
-        }
-        return standart_type_nodes;
     }
 
     void Output() override

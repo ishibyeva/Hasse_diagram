@@ -42,6 +42,25 @@ public:
 	~Vertex_set();
 };
 
+struct KeyHasher
+{
+    size_t operator()(const Vertex_set& a) const
+    {
+		std::string hashable_type;
+		for (auto &elem: a.vertices)
+			hashable_type += std::to_string(elem);
+        return std::hash<std::string>{}(hashable_type);
+    }
+};
+
+struct KeyEquals
+{
+    bool operator()(const Vertex_set& a, const Vertex_set& b) const
+    {
+        return a.vertices == b.vertices;
+    }
+};
+
 struct H_Diag_Node
 {
 	Vertex_set Vert_adrH;
@@ -51,10 +70,12 @@ struct H_Diag_Node
 void First_Act(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
 			   std::vector<std::list<size_t>> &start_f_storage,
 			   std::list<size_t> &V_set,
-			   std::list<Vertex_set> &Q);
+			   std::list<Vertex_set> &Q,
+			   std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store);
 void Facet_List_Building(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
 						 std::vector<std::list<size_t>> &start_f_storage,
-						 std::list<size_t> &V_set);
+						 std::list<size_t> &V_set,
+						 std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store);
 std::list<Vertex_set> Search_of_G_set(Vertex_set &vset, std::vector<std::list<size_t>> &start_v_storage,
 									  std::vector<std::list<size_t>> &start_f_storage,
 									  std::list<size_t> &V_set);
