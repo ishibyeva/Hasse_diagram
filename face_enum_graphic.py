@@ -1,22 +1,39 @@
-from pathlib import Path
+import pathlib
 
 from face_enumeration import Interface_KP
-
 from graphviz import Digraph
+from numpy import array, ndarray
 
 
-class FaceEnum():
-    def __init__(self, path_to_file: Path | None) -> None:
-        if path_to_file:
-            vector_interpretation = self.read_from_file(path_to_file)
+class FaceEnumeration():
+    """
+    Special class for face enuumeration calculation.
+    """
+    def __init__(self, incidence_matrix, poly_parameters: list[str] | None = None) -> None:
+        """
+        That constructor get incidence matrix in ndarray, list of incedence or path to file.
+
+        Args:
+
+            - incidence_matrix: Path, list or ndarray
+            - poly_parameters(needs only for list or ndarray incidence_matrix): list with 
+            [faset_number, vertex_number, dimersation]
+        """
+        if isinstance(incidence_matrix, pathlib.PurePath) or isinstance(incidence_matrix, str):
+            vector_interpretation = self._read_from_file(incidence_matrix)
+        elif isinstance(incidence_matrix, list):
+            vector_interpretation = self._read_list_incidence(incidence_matrix, poly_parameters)
+        elif isinstance(incidence_matrix, ndarray):
+            vector_interpretation = self._read_np_array_incidence(incidence_matrix, poly_parameters)
         else:
-            vector_interpretation = []
+            raise TypeError('Wrong type. Please use list, Path or ndarray.')
+        
         self.enumeration_interface = Interface_KP(vector_interpretation)
         self.enumeration_interface.ConvertToData()
         self.is_enumerated = False
 
     @staticmethod
-    def read_from_file(path: Path) -> list[int]:
+    def _read_from_file(path: pathlib.PurePath | str) -> list[int]:
         result_data_vector = []
         with open(path, 'r') as fl:
             lines = fl.readlines()
@@ -25,6 +42,14 @@ class FaceEnum():
                 result_data_vector.append(data_list)
         result_data_vector[3:] = sorted(result_data_vector[3:])
         return result_data_vector
+    
+    @staticmethod
+    def _read_list_incidence(incidence_list, poly_parameters):
+        pass
+
+    @staticmethod
+    def _read_np_array_incidence(np_incidence, poly_parameters):
+        pass
 
     def face_enumeration(self):
         """
@@ -64,20 +89,24 @@ class FaceEnum():
                 if coatom_dim > atom_dim + 1:
                     break
                 intersection = set(coatom).intersection(face)
+                intersection = sorted(intersection)
                 if tuple(intersection) == face:
                     list_enterpretation.append((face, coatom))
         
         str_list_enterpretation = [(' '.join(str(x) for x in face1), ' '.join(str(x) for x in face2))
                                    for face1, face2 in list_enterpretation]
-        graph_interpret = Digraph('Hasse_diagram', filename='Hasse_diagram.gv', engine="dot")
+        graph_interpret = Digraph('Hasse_diagram', format='pdf', engine="dot")
         for fc1, fc2 in str_list_enterpretation:
             graph_interpret.edge(fc1, fc2)
 
-        graph_interpret.view()
+        return graph_interpret
+    
+    def view_graph(self, graph: Digraph):
+        graph.view()
 
 
 if __name__ == "__main__":
-    test_face_enum = FaceEnum(Path.cwd() / 'Hasse_diagram' / 'examples' / 'pyr4.txt')
-    test_face_enum.face_enumeration()
+    test_face_enum = FaceEnumeration(pathlib.Path.cwd() / 'Hasse_diagram' / 'examples' / '4cube.txt')
     test_face_enum.print_text_hasse_diagramm()
-    test_face_enum.draw_hasse_diagram()
+    graph = test_face_enum.draw_hasse_diagram()
+    test_face_enum.view_graph(graph)
