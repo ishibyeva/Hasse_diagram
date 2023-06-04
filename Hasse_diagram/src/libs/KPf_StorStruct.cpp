@@ -2,7 +2,7 @@
 
 Vertex_set::Vertex_set()
 {
-	std::list<size_t> lst;
+	std::list<size_t> lst = {};
 	this->vertices = lst;
 }
 
@@ -21,7 +21,7 @@ Vertex_set::Vertex_set(const Vertex_set& v_set)
 
 Facet_set::Facet_set()
 {
-	std::list<size_t> lst;
+	std::list<size_t> lst = {};
 	this->facet = lst;
 }
 
@@ -56,20 +56,20 @@ void Facet_List_Building(int f_dim,
 						 std::vector<std::list<size_t>> &start_v_storage,
 						 std::vector<std::list<size_t>> &start_f_storage,
 						 std::list<size_t> &V_set,
-						 std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store)
+						 std::unordered_map<Vertex_set, int, KeyHasher, KeyEquals> &dimersation_store)
 {
 	for (size_t i = 0; i < start_v_storage.size(); i++)
-		V_set.push_back((size_t)(i + 1));
+		V_set.push_back(static_cast<size_t>(i));
 
-	for (int i = 0; i < f_dim; i++)
+	for (size_t i = 0; i < static_cast<size_t>(f_dim); i++)
 	{
 		std::list<size_t> temp;
-		size_t s_num = (size_t)(i + 1);
+		size_t s_num = i;
 		for (size_t j = 0; j < start_v_storage.size(); j++)
 		{
 			auto result = find(begin(start_v_storage[j]), end(start_v_storage[j]), s_num);
 			if (result != end(start_v_storage[j]))
-				temp.push_back(j + 1);
+				temp.push_back(j);
 		}
 		temp.sort();
 		start_f_storage.push_back(temp);
@@ -87,7 +87,7 @@ Vertex_set Vertex_set::Cl_operation(std::list<size_t> &lst,
 		Vertex_set v;
 		return v;
 	}
-	std::list<size_t> intersec = start_f_storage[F_rezlt.facet.front() - 1];
+	std::list<size_t> intersec = start_f_storage[F_rezlt.facet.front()];
 
 	std::list<size_t>::const_iterator i;
 	i = F_rezlt.facet.begin();
@@ -99,7 +99,7 @@ Vertex_set Vertex_set::Cl_operation(std::list<size_t> &lst,
 			search_str.insert(num);
 		intersec.clear();
 
-		for (auto &num1 : start_f_storage[*i - 1])
+		for (auto &num1 : start_f_storage[*i])
 		{
 			if (search_str.find(num1) != search_str.end())
 				intersec.push_back(num1);
@@ -119,7 +119,7 @@ Vertex_set Vertex_set::Cl_operation(std::vector<std::list<size_t>> &start_v_stor
 		Vertex_set v;
 		return v;
 	}
-	std::list<size_t> intersec = start_f_storage[F_rezlt.facet.front() - 1];
+	std::list<size_t> intersec = start_f_storage[F_rezlt.facet.front()];
 
 	std::list<size_t>::const_iterator i;
 	i = F_rezlt.facet.begin();
@@ -131,7 +131,7 @@ Vertex_set Vertex_set::Cl_operation(std::vector<std::list<size_t>> &start_v_stor
 			search_str.insert(num);
 		intersec.clear();
 
-		for (auto &num1 : start_f_storage[*i - 1])
+		for (auto &num1 : start_f_storage[*i])
 		{
 			if (search_str.find(num1) != search_str.end())
 				intersec.push_back(num1);
@@ -145,8 +145,7 @@ Vertex_set Vertex_set::Cl_operation(std::vector<std::list<size_t>> &start_v_stor
 Facet_set Vertex_set::F_operation(std::list<size_t> &lst,
 								  std::vector<std::list<size_t>> &start_v_storage)
 {
-	std::list<size_t> resrv;
-	resrv = lst;
+	std::list<size_t> resrv = lst;
 
 	for (auto &i : vertices)
 	{
@@ -154,7 +153,7 @@ Facet_set Vertex_set::F_operation(std::list<size_t> &lst,
 		for (auto &num : resrv)
 			search_str.insert(num);
 		resrv.clear();
-		for (auto &num1 : start_v_storage[i - 1])
+		for (auto &num1 : start_v_storage[i])
 		{
 			if (search_str.find(num1) != search_str.end())
 				resrv.push_back(num1);
@@ -168,7 +167,7 @@ Facet_set Vertex_set::F_operation(std::list<size_t> &lst,
 Facet_set Vertex_set::F_operation(std::vector<std::list<size_t>> &start_v_storage)
 {
 	std::list<size_t> resrv;
-	resrv = start_v_storage[vertices.front() - 1];
+	resrv = start_v_storage[vertices.front()];
 	std::list<size_t>::iterator it = ++vertices.begin();
 	for (; it != vertices.end(); it++)
 	{
@@ -176,7 +175,7 @@ Facet_set Vertex_set::F_operation(std::vector<std::list<size_t>> &start_v_storag
 		for (auto &num : resrv)
 			search_str.insert(num);
 		resrv.clear();
-		for (auto &num1 : start_v_storage[*it - 1])
+		for (auto &num1 : start_v_storage[*it])
 		{
 			if (search_str.find(num1) != search_str.end())
 				resrv.push_back(num1);
@@ -191,12 +190,11 @@ void First_Act(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
 			   std::vector<std::list<size_t>> &start_f_storage,
 			   std::list<size_t> &V_set,
 			   std::list<Vertex_set> &Q,
-			   std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store)
+			   std::unordered_map<Vertex_set, int, KeyHasher, KeyEquals> &dimersation_store)
 {
 	Facet_List_Building(f_dim, start_v_storage, start_f_storage, V_set, dimersation_store);
-	std::list<size_t> vert_l = {};
 	Q.emplace_back();
-	dimersation_store.emplace(std::make_pair(Vertex_set(), 0));
+	dimersation_store.emplace(std::make_pair(Vertex_set(), -1));
 }
 
 std::vector<std::pair<Vertex_set, size_t>> Compute_H_Collection(Vertex_set &vset,
@@ -212,7 +210,7 @@ std::vector<std::pair<Vertex_set, size_t>> Compute_H_Collection(Vertex_set &vset
 	}
 	for (auto &j : set_wt_vset)
 	{
-		Vertex_set res = vset.Cl_operation(start_v_storage[(int)j - 1], start_v_storage, start_f_storage);
+		Vertex_set res = vset.Cl_operation(start_v_storage[j], start_v_storage, start_f_storage);
 		if (!res.vertices.empty())
 			H_set.push_back(std::make_pair(res, j));
 	}

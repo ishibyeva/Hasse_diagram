@@ -71,11 +71,11 @@ void First_Act(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
 			   std::vector<std::list<size_t>> &start_f_storage,
 			   std::list<size_t> &V_set,
 			   std::list<Vertex_set> &Q,
-			   std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store);
+			   std::unordered_map<Vertex_set, int, KeyHasher, KeyEquals> &dimersation_store);
 void Facet_List_Building(int f_dim, std::vector<std::list<size_t>> &start_v_storage,
 						 std::vector<std::list<size_t>> &start_f_storage,
 						 std::list<size_t> &V_set,
-						 std::unordered_map<Vertex_set, size_t, KeyHasher, KeyEquals> &dimersation_store);
+						 std::unordered_map<Vertex_set, int, KeyHasher, KeyEquals> &dimersation_store);
 std::list<Vertex_set> Search_of_G_set(Vertex_set &vset, std::vector<std::list<size_t>> &start_v_storage,
 									  std::vector<std::list<size_t>> &start_f_storage,
 									  std::list<size_t> &V_set);

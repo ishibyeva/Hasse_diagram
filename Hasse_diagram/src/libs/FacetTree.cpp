@@ -57,7 +57,7 @@ void F_Tree::Insert(std::shared_ptr<Vertex_set> vst, std::vector<std::list<size_
 		for (; it != cur_l.end(); it++)
 		{
 			if (CS.Cl_operation(start_v_storage, start_f_storage).Get_size() <
-				CS.Cl_operation(start_v_storage[*it - 1], start_v_storage, start_f_storage).Get_size())
+				CS.Cl_operation(start_v_storage[*it], start_v_storage, start_f_storage).Get_size())
 				CS.vertices.push_back(*it);
 		}
 
@@ -104,7 +104,7 @@ bool F_Tree::Search(std::list<size_t> &vst, std::vector<std::list<size_t>> &star
 		for (; it != cur_l.end(); it++)
 		{
 			if (CS.Cl_operation(start_v_storage, start_f_storage).Get_size() <
-				CS.Cl_operation(start_v_storage[*it - 1], start_v_storage, start_f_storage).Get_size())
+				CS.Cl_operation(start_v_storage[*it], start_v_storage, start_f_storage).Get_size())
 				CS.vertices.push_back(*it);
 		}
 		for (auto &it : CS.vertices)
