@@ -53,13 +53,11 @@ void Vertex_set::Print_vert()
 }
 
 void Facet_List_Building(int f_dim,
-						 std::vector<std::list<size_t>> &start_v_storage,
 						 std::vector<std::list<size_t>> &start_f_storage,
+						 std::vector<std::list<size_t>> &start_v_storage,
 						 std::list<size_t> &V_set,
 						 std::unordered_map<Vertex_set, int, KeyHasher, KeyEquals> &dimersation_store)
 {
-	for (size_t i = 0; i < start_v_storage.size(); i++)
-		V_set.push_back(static_cast<size_t>(i));
 
 	for (size_t i = 0; i < static_cast<size_t>(f_dim); i++)
 	{
@@ -74,6 +72,9 @@ void Facet_List_Building(int f_dim,
 		temp.sort();
 		start_f_storage.push_back(temp);
 	}
+
+	for (size_t i = 0; i < start_f_storage.size(); i++)
+		V_set.push_back(static_cast<size_t>(i));
 }
 
 Vertex_set Vertex_set::Cl_operation(std::list<size_t> &lst,

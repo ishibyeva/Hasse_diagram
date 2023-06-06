@@ -20,19 +20,19 @@ class Base_Interface
 {
 protected:
     std::vector<std::vector<size_t>> data_;
-    int v_num_, f_num_, dim_;
+    int f_num_, v_num_, dim_;
 
 public:
     Base_Interface(std::vector<std::vector<size_t>> &vector_form_data)
     {
-        v_num_ = vector_form_data[0][0];
-        f_num_ = vector_form_data[1][0];
+        f_num_ = vector_form_data[0][0];
+        v_num_ = vector_form_data[1][0];
         dim_ = vector_form_data[2][0];
 
         std::copy(vector_form_data.begin() + 3, vector_form_data.end(), std::back_inserter(data_));
     }
     Base_Interface(std::vector<std::vector<size_t>> &data, int v_num, int f_num, int dim)
-        : data_(data), v_num_(v_num), f_num_(f_num), dim_(dim)
+        : data_(data), f_num_(v_num), v_num_(f_num), dim_(dim)
     {
     }
 
@@ -65,13 +65,13 @@ public:
             {
                 reserv.push_back(str_elem);
             }
-            start_v_storage.push_back(reserv);
+            start_f_storage.push_back(reserv);
         }
     }
 
     void FindAllFace() override
     {
-        First_Act(f_num_, start_v_storage, start_f_storage, V_set, Q, dimersation_store);
+        First_Act(v_num_, start_v_storage, start_f_storage, V_set, Q, dimersation_store);
         auto ftree = std::make_unique<F_Tree>();
         std::list<Vertex_set> min_sets;
 
@@ -98,7 +98,7 @@ public:
         }
 
         std::list<size_t> full_set;
-        for (size_t i = 1; i <= static_cast<size_t>(v_num_); ++i)
+        for (size_t i = 1; i <= static_cast<size_t>(f_num_); ++i)
             full_set.push_back(i);
         auto backH = std::make_unique<Vertex_set>(full_set); 
 

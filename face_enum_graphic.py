@@ -18,16 +18,14 @@ class FaceEnumeration():
 
             - incidence_matrix: Path, list or ndarray: list of list[int] with vertex-facet incidence.
             - poly_parameters(needs only for list or ndarray incidence_matrix): list with
-            [vertex_number, facet_number, dimersation]
+            [facet_number, vertex_number, dimersation]
         """
         if isinstance(incidence_matrix, pathlib.PurePath) or isinstance(incidence_matrix, str):
             vector_interpretation = self._read_from_file(incidence_matrix)
-            print(vector_interpretation)
         elif isinstance(incidence_matrix, list):
             if poly_parameters:
                 vector_interpretation = self._read_list_incidence(
                     incidence_matrix, poly_parameters)
-                print(vector_interpretation)
             else:
                 raise ValueError('poly_parameters is wrong or empty. Please, enter parameters correctly')
         elif isinstance(incidence_matrix, np.ndarray):
@@ -123,9 +121,10 @@ class FaceEnumeration():
         graph.view()
 
 
+
 if __name__ == "__main__":
     test_face_enum = FaceEnumeration(
         pathlib.Path.cwd() / 'Hasse_diagram' / 'examples' / 'pyr4.txt')
     test_face_enum.print_text_hasse_diagramm()
     graph = test_face_enum.draw_hasse_diagram()
-    test_face_enum.view_graph(graph)
+    graph.view()
