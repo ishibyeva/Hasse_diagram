@@ -66,6 +66,10 @@ class FaceEnumeration():
         result_data_vector.append([x] for x in poly_parameters)
         result_data_vector.extend(np_incidence.tolist())
         return result_data_vector
+    
+    @property
+    def get_dim(self):
+        return self.enumeration_interface.dim_
 
     def face_enumeration(self):
         """
@@ -111,7 +115,7 @@ class FaceEnumeration():
 
         str_list_enterpretation = [(' '.join(str(x) for x in face1), ' '.join(str(x) for x in face2))
                                    for face1, face2 in list_enterpretation]
-        graph_interpret = Digraph('Hasse_diagram', format='pdf', engine="dot", graph_attr={"concentrate": "true"})
+        graph_interpret = Digraph('Hasse_diagram', format='png', engine="dot", graph_attr={"concentrate": "true"})
         for fc1, fc2 in str_list_enterpretation:
             graph_interpret.edge(fc1, fc2)
 
